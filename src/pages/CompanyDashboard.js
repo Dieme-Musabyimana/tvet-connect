@@ -14,7 +14,6 @@ export default function CompanyDashboard() {
   });
 
   const [offerData, setOfferData] = useState({
-    studentId: "",
     offerType: "",
   });
 
@@ -34,11 +33,11 @@ export default function CompanyDashboard() {
     setOfferData({ ...offerData, [name]: value });
   };
   
-  const handleOfferSubmit = (e) => {
+  const handleOfferSubmit = (e, studentId) => {
     e.preventDefault();
-    const result = offerStudent({ studentId: offerData.studentId, companyId: company.companyId, offerType: offerData.offerType });
+    const result = offerStudent({ studentId, offerType: offerData.offerType });
     alert(result.message);
-    setOfferData({ studentId: "", offerType: "" });
+    setOfferData({ offerType: "" });
   };
 
   if (!currentUser || currentUser.role !== "company") {
@@ -96,8 +95,7 @@ export default function CompanyDashboard() {
             <p>Level: {p.level}</p>
             <p>Skills: {p.skills}</p>
             <p>Target: {p.target}</p>
-            <form onSubmit={handleOfferSubmit} style={{ marginTop: '10px' }}>
-              <input type="hidden" name="studentId" value={p.studentId} />
+            <form onSubmit={(e) => handleOfferSubmit(e, p.studentId)} style={{ marginTop: '10px' }}>
               <select name="offerType" value={offerData.offerType} onChange={handleOfferChange} required>
                 <option value="">Select Offer Type</option>
                 <option value="Job">Job</option>

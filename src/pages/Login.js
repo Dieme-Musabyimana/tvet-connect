@@ -2,23 +2,28 @@ import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDB } from "../context/InMemoryDB";
 
-const idLabels = {
-  student: "Student ID / Email",
-  school: "School ID / Email",
-  company: "Company ID / Email",
+const roleIdentifiers = {
+  student: "Email or Student ID",
+  school: "Email or School ID",
+  company: "Email or Company ID",
+  rtb: "Email",
 };
 
 export default function Login() {
   const { role } = useParams();
   const navigate = useNavigate();
   const { loginUser } = useDB();
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({});
   const [message, setMessage] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const result = loginUser({ role, identifier, password });
+    const result = loginUser({ role, identifier: formData.identifier, password: formData.password });
     if (result.success) {
       navigate(`/dashboard/${role}`);
     } else {
@@ -28,20 +33,20 @@ export default function Login() {
 
   return (
     <div className="page">
-      <h1>Log in as {role}</h1>
+      <h1>{role} Login</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder={idLabels[role]}
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
+          name="identifier"
+          placeholder={roleIdentifiers[role]}
+          onChange={handleChange}
           required
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handleChange}
           required
         />
         <button type="submit">Log In</button>

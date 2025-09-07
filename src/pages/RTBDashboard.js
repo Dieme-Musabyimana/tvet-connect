@@ -153,7 +153,18 @@ export default function RTBDashboard() {
           users.filter(u => u.role === 'company').map(company => (
             <div key={company.id} className="profile-card">
               <p><strong>Company Name:</strong> {company.details.companyName}</p>
-              <p><strong>Job Postings:</strong> {jobPosts.filter(p => p.companyId === company.details.companyId).length}</p>
+              <h4>Posted Opportunities:</h4>
+              {jobPosts.filter(p => p.companyId === company.details.companyId).length > 0 ? (
+                jobPosts.filter(p => p.companyId === company.details.companyId).map(post => (
+                  <div key={post.id} className="job-post-item">
+                    <p><strong>Position:</strong> {post.position}</p>
+                    <p><strong>Type:</strong> {post.type}</p>
+                    <p><strong>Skills:</strong> {post.requiredSkills}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No opportunities posted yet.</p>
+              )}
             </div>
           ))
         ) : (
