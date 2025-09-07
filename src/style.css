@@ -1,0 +1,232 @@
+/* General Body and Layout */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Navigation Bar */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav a {
+  color: #0056b3;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #003d82;
+}
+
+nav button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+  background-color: #c82333;
+}
+
+/* Main Content Area */
+.content {
+  flex-grow: 1;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.page {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin-top: 2rem;
+}
+
+.page h1, .page h2 {
+  color: #0056b3;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Forms and Inputs */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+form input, form select, form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+form button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #218838;
+}
+
+/* Buttons */
+.role-buttons, .connect-buttons, .social-media-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.role-buttons button, .connect-buttons button, .social-media-buttons button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.role-buttons button:hover, .connect-buttons button:hover, .social-media-buttons button:hover {
+  background-color: #0056b3;
+}
+
+/* Card Components (for profiles, posts, etc.) */
+.profile-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.profile-card h3 {
+  color: #007bff;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Quiz Section */
+.section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.options button {
+  background-color: #e9ecef;
+  color: #333;
+  border: 1px solid #ced4da;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.options button:hover {
+  background-color: #ced4da;
+}
+
+/* Chat Section */
+.chat-container {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message {
+  background-color: #e2f2ff;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+.announcement-message {
+  background-color: #ffe6e6;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 2px solid #dc3545;
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #6c757d;
+  display: block;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.chat-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-form input {
+  flex-grow: 1;
+}
+
+.chat-form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
