@@ -4,30 +4,31 @@ import { useDB } from "../context/InMemoryDB";
 
 const roleFields = {
   student: [
-    { name: "bothNames", label: "Both Names", type: "text" },
-    { name: "email", label: "Email Address", type: "email" },
-    { name: "studentId", label: "Student ID (e.g., 22RP03385)", type: "text" },
-    { name: "phone", label: "Phone Number", type: "tel" },
-    { name: "password", label: "Password", type: "password" },
+    { name: "bothNames", label: "Both Names", type: "text", required: true },
+    { name: "email", label: "Email Address", type: "email", required: true },
+    { name: "studentId", label: "Student ID (e.g., 22RP03385)", type: "text", required: true },
+    { name: "phone", label: "Phone Number", type: "tel", required: true },
+    { name: "password", label: "Password", type: "password", required: true },
+    { name: "photo", label: "Profile Photo (Optional)", type: "file", required: false },
   ],
   school: [
-    { name: "schoolName", label: "School Name", type: "text" },
-    { name: "email", label: "School Email", type: "email" },
-    { name: "schoolId", label: "School ID (e.g., RPcollege)", type: "text" },
-    { name: "contactNumber", label: "School Contact Number", type: "tel" },
-    { name: "password", label: "Password", type: "password" },
+    { name: "schoolName", label: "School Name", type: "text", required: true },
+    { name: "email", label: "School Email", type: "email", required: true },
+    { name: "schoolId", label: "School ID (e.g., RPcollege)", type: "text", required: true },
+    { name: "contactNumber", label: "School Contact Number", type: "tel", required: true },
+    { name: "password", label: "Password", type: "password", required: true },
   ],
   company: [
-    { name: "companyName", label: "Company Name", type: "text" },
-    { name: "email", label: "Company Email", type: "email" },
-    { name: "companyId", label: "Company ID (e.g., MyCompany)", type: "text" },
-    { name: "contactNumber", label: "Company Contact Number", type: "tel" },
-    { name: "password", label: "Password", type: "password" },
+    { name: "companyName", label: "Company Name", type: "text", required: true },
+    { name: "email", label: "Company Email", type: "email", required: true },
+    { name: "companyId", label: "Company ID (e.g., MyCompany)", type: "text", required: true },
+    { name: "contactNumber", label: "Company Contact Number", type: "tel", required: true },
+    { name: "password", label: "Password", type: "password", required: true },
   ],
   rtb: [
-    { name: "email", label: "Email Address", type: "email" },
-    { name: "phone", label: "Phone Number", type: "tel" },
-    { name: "password", label: "Password", type: "password" },
+    { name: "email", label: "Email Address", type: "email", required: true },
+    { name: "phone", label: "Phone Number", type: "tel", required: true },
+    { name: "password", label: "Password", type: "password", required: true },
   ],
 };
 
@@ -41,8 +42,12 @@ export default function Register() {
   const schools = users.filter(user => user.role === "school");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, files } = e.target;
+    if (name === "photo") {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -59,7 +64,7 @@ export default function Register() {
   return (
     <div className="page">
       <h1>Create {role} Account</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="auth-form">
         {role === "student" && (
           <select name="school" value={formData.school || ""} onChange={handleChange} required>
             <option value="">Select your School</option>
@@ -77,7 +82,7 @@ export default function Register() {
             name={field.name}
             placeholder={field.label}
             onChange={handleChange}
-            required
+            required={field.required}
           />
         ))}
         <button type="submit">Create Account</button>

@@ -55,18 +55,18 @@ const allQuestions = [
 ];
 
 export default function Quiz() {
-  const { addQuizWinner } = useDB();
+  const { addQuizWinner, rewardedWinners } = useDB();
   const [round, setRound] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [message, setMessage] = useState("");
   const [participantInfo, setParticipantInfo] = useState({ phone: "", name: "" });
   const [started, setStarted] = useState(false);
   const [quizSet, setQuizSet] = useState([]);
+  const [isWinner, setIsWinner] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
 
-  // Function to get 20 random questions
   const getRandomQuestions = () => {
     const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 20);
@@ -78,6 +78,7 @@ export default function Quiz() {
       setStarted(true);
       setQuizSet(getRandomQuestions());
       setMessage("");
+      setIsWinner(false);
     } else {
       setMessage("Please enter your name and phone number to start.");
     }
@@ -85,32 +86,43 @@ export default function Quiz() {
 
   const currentQuestion = quizSet[currentQuestionIndex];
   
-  const handleAnswer = (selectedAnswer) => {
-    if (showAnswer) return;
-
-    if (selectedAnswer === currentQuestion.a) {
+  const handleAnswer = (answer) => {
+    if (selectedAnswer !== null) return;
+    
+    setSelectedAnswer(answer);
+    
+    if (answer === currentQuestion.a) {
       setScore(score + 5);
       setMessage("Correct!");
     } else {
       setMessage("Wrong answer. See the correct answer and a link to learn more.");
     }
-    setShowAnswer(true);
-
-    setTimeout(() => {
-      if (currentQuestionIndex < quizSet.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setShowAnswer(false);
-        setMessage("");
-      } else {
-        setShowResult(true);
-        if (score + (selectedAnswer === currentQuestion.a ? 5 : 0) >= 75) {
-          addQuizWinner({ ...participantInfo, finalScore: score + (selectedAnswer === currentQuestion.a ? 5 : 0) });
-        }
-      }
-    }, 2000);
   };
-  
+
+  const handleNextQuestion = () => {
+    setSelectedAnswer(null);
+    setMessage("");
+    if (currentQuestionIndex < quizSet.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      const finalScore = score;
+      setShowResult(true);
+      if (finalScore >= 75 && round <= 2) {
+        const newWinner = { id: Date.now(), ...participantInfo, finalScore };
+        addQuizWinner(newWinner);
+        setIsWinner(true);
+        setMessage("Congratulations, you are a winner!");
+      } else {
+        setMessage("You did not win a prize. Try again next round!");
+      }
+    }
+  };
+
   const handleRestartQuiz = () => {
+    if (isWinner && !rewardedWinners.find(w => w.phone === participantInfo.phone)) {
+      alert("You cannot leave until your reward is sent. Please wait for RTB to process your reward.");
+      return;
+    }
     if (round >= 2) {
       setMessage("You have completed your two rounds for the prize. You can continue, but without a prize.");
     }
@@ -118,8 +130,18 @@ export default function Quiz() {
     setScore(0);
     setCurrentQuestionIndex(0);
     setShowResult(false);
-    setShowAnswer(false);
+    setSelectedAnswer(null);
+    setMessage("");
     setQuizSet(getRandomQuestions());
+    setIsWinner(false);
+  };
+  
+  const handleLeaveQuiz = () => {
+    if (isWinner && !rewardedWinners.find(w => w.phone === participantInfo.phone)) {
+      alert("You cannot leave until your reward is sent. Please wait for RTB to process your reward.");
+      return;
+    }
+    setStarted(false);
   };
 
   const handleShare = () => {
@@ -152,20 +174,22 @@ export default function Quiz() {
 
   if (showResult) {
     const finalScore = score;
-    const isWinner = finalScore >= 75 && round <= 2;
+    const isAlreadyRewarded = rewardedWinners.find(w => w.phone === participantInfo.phone);
+
     return (
       <div>
         <h2>Quiz Complete!</h2>
         <p>Your score is: {finalScore}%</p>
-        {isWinner ? (
+        {isWinner && !isAlreadyRewarded ? (
           <div>
             <p>Congratulations, you are a winner! Your details have been sent to RTB for your 200 RWF prize.</p>
-            <p>A button to share with friends will automatically appear.</p>
+            <p>Please do not leave the quiz until your reward is sent.</p>
           </div>
         ) : (
-          <p>You did not win a prize. Try again next round!</p>
+          <p>{message}</p>
         )}
         <button onClick={handleRestartQuiz}>Start Round {round + 1}</button>
+        <button onClick={handleLeaveQuiz}>Leave Quiz</button>
         <button onClick={handleShare}>Share & Invite Friends</button>
       </div>
     );
@@ -177,22 +201,31 @@ export default function Quiz() {
       <p>{currentQuestion.q}</p>
       <div className="options">
         {currentQuestion.options.map((option, index) => (
-          <button key={index} onClick={() => handleAnswer(option)}>
+          <button 
+            key={index} 
+            onClick={() => handleAnswer(option)}
+            style={{ 
+              backgroundColor: selectedAnswer === option ? 
+                (option === currentQuestion.a ? 'green' : 'red') : 
+                '#004d40'
+            }}
+          >
             {option}
           </button>
         ))}
       </div>
-      {showAnswer && (
+      {selectedAnswer !== null && (
         <div style={{ marginTop: "10px" }}>
-          <p style={{ color: currentQuestion.a === message.split('.')[0] ? 'green' : 'red' }}>
-            {message}
+          <p style={{ color: selectedAnswer === currentQuestion.a ? 'green' : 'red' }}>
+            {selectedAnswer === currentQuestion.a ? "Correct!" : "Wrong answer."}
           </p>
-          {currentQuestion.a !== message.split('.')[0] && (
+          {selectedAnswer !== currentQuestion.a && (
             <p>The correct answer is: <strong>{currentQuestion.a}</strong></p>
           )}
           <a href={currentQuestion.link} target="_blank" rel="noopener noreferrer">
             Learn more about TVET
           </a>
+          <button onClick={handleNextQuestion} style={{ marginTop: "10px" }}>Next</button>
         </div>
       )}
     </div>

@@ -2,12 +2,22 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDB } from "../context/InMemoryDB";
 import Quiz from "../components/Quiz";
+import HomeStats from "../components/HomeStats";
+import { FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
+import { SiX } from 'react-icons/si';
 
 const roles = [
   { name: "Student", path: "student" },
   { name: "School", path: "school" },
   { name: "Company", path: "company" },
   { name: "RTB", path: "rtb" }
+];
+
+const socialMediaLinks = [
+  { name: "X", icon: <SiX />, url: "https://x.com/RwandaTVETBoard" },
+  { name: "Twitter", icon: <FaTwitter />, url: "https://twitter.com/RwandaTVETBoard" },
+  { name: "Facebook", icon: <FaFacebook />, url: "https://www.facebook.com/RwandaTVETBoard" },
+  { name: "Instagram", icon: <FaInstagram />, url: "https://www.instagram.com/rwandatvetboard" }
 ];
 
 export default function Home() {
@@ -24,6 +34,11 @@ export default function Home() {
             {role.name}
           </button>
         ))}
+      </div>
+      
+      {/* Home Stats Section */}
+      <div className="section">
+        <HomeStats />
       </div>
 
       {/* Quiz Section */}
@@ -55,8 +70,9 @@ export default function Home() {
           successStories.map(story => (
             <div key={story.id} className="profile-card">
               <h3>{story.title}</h3>
+              <p>by {story.author}</p>
               <p>{story.text}</p>
-              <img src={story.imageUrl} alt="Success Story" style={{ maxWidth: "100%", height: "auto" }} />
+              {story.imageUrl && <img src={story.imageUrl} alt="Success Story" style={{ maxWidth: "100%", height: "auto" }} />}
             </div>
           ))
         ) : (
@@ -67,27 +83,27 @@ export default function Home() {
       {/* Contact and Social Media Section */}
       <div className="section">
         <h2>Connect With Us</h2>
-        <div className="connect-buttons">
-          <a href="https://wa.me/250786862261" target="_blank" rel="noopener noreferrer">
-            <button>Meet with Mentor or Counselor at RTB</button>
-          </a>
-          <a href="https://wa.me/250782763011" target="_blank" rel="noopener noreferrer">
-            <button>Meet with Alumni Member</button>
-          </a>
-          <a href="https://chat.whatsapp.com/Jd1820626" target="_blank" rel="noopener noreferrer">
-            <button>Join Our WhatsApp Organisation</button>
-          </a>
-        </div>
-        <div className="social-media-buttons">
-          <a href="https://twitter.com/tvet" target="_blank" rel="noopener noreferrer">
-            <button>Follow us on X (Twitter)</button>
-          </a>
-          <a href="https://instagram.com/tvet" target="_blank" rel="noopener noreferrer">
-            <button>Follow us on Instagram</button>
-          </a>
-          <a href="https://facebook.com/tvet" target="_blank" rel="noopener noreferrer">
-            <button>Follow us on Facebook</button>
-          </a>
+        <div className="connect-buttons-container">
+          <div className="connect-buttons">
+            <a href="https://wa.me/250786862261" target="_blank" rel="noopener noreferrer">
+              <button>Meet with a Mentor at RTB</button>
+            </a>
+            <a href="https://wa.me/250782763011" target="_blank" rel="noopener noreferrer">
+              <button>Meet with Alumni Member</button>
+            </a>
+            <a href="https://chat.whatsapp.com/Jd1820626" target="_blank" rel="noopener noreferrer">
+              <button>Join Our WhatsApp Group</button>
+            </a>
+          </div>
+          <div className="social-media-buttons">
+            {socialMediaLinks.map(platform => (
+              <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer">
+                <button>
+                  {platform.icon} {platform.name}
+                </button>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </div>

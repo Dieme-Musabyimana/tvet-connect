@@ -1,61 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDB } from "../context/InMemoryDB";
 
 export default function GeneralOrgChat() {
-  const { currentUser, generalOrgChat, rtbAnnouncements, addGeneralMessage, addRTBAnnouncement } = useDB();
+  const { currentUser, generalOrgChat, addGeneralMessage, rtbAnnouncements, addRTBAnnouncement } = useDB();
   const [message, setMessage] = useState("");
+  const [announcement, setAnnouncement] = useState("");
+  const [replyTo, setReplyTo] = useState(null); 
+  const chatDisplayRef = useRef(null);
 
-  const handleSendMessage = (e) => {
+  const handleMessageSubmit = (e) => {
     e.preventDefault();
-    if (message.trim() === "") return;
-    addGeneralMessage({
-      sender: currentUser.details.schoolName || currentUser.role,
-      text: message,
-      timestamp: new Date().toLocaleTimeString(),
-    });
-    setMessage("");
+    if (message.trim()) {
+      addGeneralMessage({
+        id: Date.now(),
+        sender: currentUser.role === 'school' ? currentUser.details.schoolName : currentUser.details.email,
+        text: message,
+        timestamp: new Date().toISOString(),
+        replyTo: replyTo 
+      });
+      setMessage("");
+      setReplyTo(null);
+    }
   };
 
-  const handleSendAnnouncement = (e) => {
+  const handleAnnouncementSubmit = (e) => {
     e.preventDefault();
-    if (message.trim() === "") return;
-    addRTBAnnouncement({
-      sender: "RTB",
-      text: message,
-      timestamp: new Date().toLocaleTimeString(),
-    });
-    setMessage("");
+    if (announcement.trim()) {
+      addRTBAnnouncement({
+        id: Date.now(),
+        text: announcement,
+        timestamp: new Date().toISOString()
+      });
+      setAnnouncement("");
+    }
   };
+
+  const isRTB = currentUser?.role === "rtb";
+
+  useEffect(() => {
+    if (chatDisplayRef.current) {
+      chatDisplayRef.current.scrollTop = chatDisplayRef.current.scrollHeight;
+    }
+  }, [generalOrgChat]);
 
   return (
     <div className="chat-container">
-      <div className="messages">
-        {rtbAnnouncements.map((announcement, index) => (
-          <div key={index} className="announcement-message">
-            <p>
-              <strong>📢 RTB Announcement:</strong> {announcement.text}
-            </p>
-            <span className="timestamp">{announcement.timestamp}</span>
+      <div className="chat-display" ref={chatDisplayRef}>
+        {generalOrgChat.map(msg => (
+          <div key={msg.id} className="chat-message">
+            {msg.replyTo && (
+              <div className="reply-quote">
+                <strong>Replying to {msg.replyTo.sender}:</strong>
+                <p>{msg.replyTo.text}</p>
+              </div>
+            )}
+            <div className="message-content">
+              <strong>{msg.sender}:</strong> {msg.text}
+            </div>
+            <button onClick={() => setReplyTo(msg)} className="reply-button">Reply</button>
           </div>
         ))}
-        {generalOrgChat.map((chatMessage, index) => (
-          <div key={index} className="chat-message">
-            <p>
-              <strong>{chatMessage.sender}:</strong> {chatMessage.text}
-            </p>
-            <span className="timestamp">{chatMessage.timestamp}</span>
+        {rtbAnnouncements.map(ann => (
+          <div key={ann.id} className="chat-announcement">
+            <strong>RTB Announcement:</strong> {ann.text}
           </div>
         ))}
       </div>
-      <form className="chat-form" onSubmit={currentUser.role === 'rtb' ? handleSendAnnouncement : handleSendMessage}>
+      {replyTo && (
+        <div className="replying-to-bar">
+          Replying to {replyTo.sender}: "{replyTo.text.substring(0, 30)}..."
+          <button onClick={() => setReplyTo(null)}>X</button>
+        </div>
+      )}
+      <form onSubmit={handleMessageSubmit} className="chat-form">
         <input
           type="text"
-          placeholder={currentUser.role === 'rtb' ? "Write an announcement..." : "Write a message..."}
+          placeholder="Send a general message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          disabled={isRTB}
         />
-        <button type="submit">Send</button>
+        <button type="submit" disabled={isRTB}>Send</button>
       </form>
+      {isRTB && (
+        <form onSubmit={handleAnnouncementSubmit} className="announcement-form">
+          <input
+            type="text"
+            placeholder="Post a new announcement..."
+            value={announcement}
+            onChange={(e) => setAnnouncement(e.target.value)}
+          />
+          <button type="submit">Post Announcement</button>
+        </form>
+      )}
     </div>
   );
 }

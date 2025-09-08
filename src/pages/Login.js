@@ -34,7 +34,7 @@ export default function Login() {
   return (
     <div className="page">
       <h1>{role} Login</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="auth-form">
         <input
           type="text"
           name="identifier"

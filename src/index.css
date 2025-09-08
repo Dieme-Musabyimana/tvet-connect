@@ -55,13 +55,13 @@ nav button {
   font-size: 1.2rem;
   border: none;
   border-radius: 8px;
-  background: #eee;
+  background:rgb(114, 114, 252);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .role-buttons button:hover {
-  background: #ddd;
+  opacity:0.8 
 }
 
 form {

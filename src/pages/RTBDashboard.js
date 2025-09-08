@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDB } from "../context/InMemoryDB";
 import GeneralOrgChat from "../components/GeneralOrgChat";
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 export default function RTBDashboard() {
   const { 
@@ -12,7 +13,12 @@ export default function RTBDashboard() {
     quizQuestions,
     createQuizQuestion,
     quizWinners,
-    addSuccessStory
+    addSuccessStory,
+    companyGeneralChat,
+    rewardWinner,
+    getDashboardStats,
+    getMarketStats,
+    applications
   } = useDB();
 
   const [quizData, setQuizData] = useState({ q: "", a: "", options: "" });
@@ -43,10 +49,13 @@ export default function RTBDashboard() {
     alert("Success story added!");
   };
   
-  const handleRewardWinner = (phone) => {
-    // This is a simulation. The actual USSD code cannot be executed from the browser.
+  const handleRewardWinner = (winnerId, phone) => {
     const ussdCode = `*182*1*1*${phone.replace(/\D/g,'')}*200*40077#`;
-    alert(`Simulating payment for winner with phone number: ${phone}. USSD code: ${ussdCode}`);
+    const isRewarded = window.confirm(`Simulating payment for winner with phone number: ${phone}. Click OK to confirm payment sent.`);
+    if (isRewarded) {
+      rewardWinner(winnerId);
+      alert("Winner has been marked as rewarded.");
+    }
   };
 
   if (!currentUser || currentUser.role !== "rtb") {
@@ -55,10 +64,94 @@ export default function RTBDashboard() {
   
   const approvedProfiles = profiles.filter(p => p.status === "approved");
   const schools = users.filter(u => u.role === "school");
+  const stats = getDashboardStats();
+  const marketStats = getMarketStats();
+
+  const pieChartData = [
+    { name: 'Students Seeking Offers', value: marketStats.studentsSeekingOffers },
+    { name: 'Available Job Opportunities', value: marketStats.totalPositions },
+    { name: 'Students Already Offered', value: marketStats.offeredStudentsCount }
+  ];
+  const COLORS = ['#FFBB28', '#00C49F', '#8884d8'];
 
   return (
     <div className="page">
       <h1>RTB Dashboard</h1>
+
+      {/* Statistics Section */}
+      <div className="section">
+        <h2>General Statistics</h2>
+        <div className="stats-grid">
+          <div className="stat-card">Total Students: {stats.totalStudents}</div>
+          <div className="stat-card">Total Schools: {stats.totalSchools}</div>
+          <div className="stat-card">Total Companies: {stats.totalCompanies}</div>
+          <div className="stat-card">Approved Profiles: {stats.approvedProfiles}</div>
+          <div className="stat-card">Job Posts: {stats.jobPostsCount}</div>
+          <div className="stat-card">Offered Students: {stats.offeredStudentsCount}</div>
+        </div>
+      </div>
+
+      {/* Market Statistics & Graphs */}
+      <div className="section">
+        <h2>Job Market Overview</h2>
+        <p>This graph compares the number of students seeking offers, available opportunities, and students who have already received offers.</p>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <PieChart width={400} height={400}>
+            <Pie
+              dataKey="value"
+              data={pieChartData}
+              cx="50%"
+              cy="50%"
+              outerRadius={150}
+              fill="#8884d8"
+              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+            >
+              {pieChartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </div>
+        <div className="stats-text">
+            <p><strong>Students Seeking Offers:</strong> {marketStats.studentsSeekingOffers}</p>
+            <p><strong>Available Job Opportunities:</strong> {marketStats.totalPositions}</p>
+            <p><strong>Students Already Offered:</strong> {marketStats.offeredStudentsCount}</p>
+        </div>
+      </div>
+      
+      {/* Student Applications Section */}
+      <div className="section">
+        <h2>Student Applications</h2>
+        {applications.length > 0 ? (
+          applications.map(app => (
+            <div key={app.id} className="profile-card">
+              <h3>{app.studentProfile.bothNames}</h3>
+              <p>Applied for: {app.jobPost.position} at {app.jobPost.companyName}</p>
+              <p>Status: {app.status}</p>
+            </div>
+          ))
+        ) : (
+          <p>No student applications yet.</p>
+        )}
+      </div>
+
+      {/* Company Comments */}
+      <div className="section">
+        <h2>Company General Comments</h2>
+        {companyGeneralChat.length > 0 ? (
+          companyGeneralChat.map(comment => (
+            <div key={comment.id} className="profile-card">
+              <p><strong>From:</strong> {comment.sender}</p>
+              <p>{comment.text}</p>
+              <p><em>{new Date(comment.timestamp).toLocaleString()}</em></p>
+            </div>
+          ))
+        ) : (
+          <p>No comments from companies yet.</p>
+        )}
+      </div>
 
       {/* Quiz Management */}
       <div className="section">
@@ -98,7 +191,7 @@ export default function RTBDashboard() {
               <h3>{winner.name}</h3>
               <p>Phone: {winner.phone}</p>
               <p>Score: {winner.finalScore}%</p>
-              <button onClick={() => handleRewardWinner(winner.phone)}>Reward Winner</button>
+              <button onClick={() => handleRewardWinner(winner.id, winner.phone)}>Reward Winner</button>
             </div>
           ))
         ) : (

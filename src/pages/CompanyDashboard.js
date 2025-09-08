@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useDB } from "../context/InMemoryDB";
 
 export default function CompanyDashboard() {
-  const { currentUser, profiles, createJobPost, offerStudent, jobPosts } = useDB();
+  const { currentUser, profiles, createJobPost, offerStudent, jobPosts, addCompanyComment, offeredStudents } = useDB();
   const company = currentUser?.details;
   const approvedProfiles = profiles.filter(p => p.status === "approved");
+  const myOfferedStudents = offeredStudents.filter(o => o.company.companyId === company.companyId);
 
   const [jobPostData, setJobPostData] = useState({
     position: "",
@@ -16,6 +17,8 @@ export default function CompanyDashboard() {
   const [offerData, setOfferData] = useState({
     offerType: "",
   });
+
+  const [companyComment, setCompanyComment] = useState("");
 
   const handleJobPostChange = (e) => {
     const { name, value } = e.target;
@@ -35,9 +38,21 @@ export default function CompanyDashboard() {
   
   const handleOfferSubmit = (e, studentId) => {
     e.preventDefault();
-    const result = offerStudent({ studentId, offerType: offerData.offerType });
+    const result = offerStudent({ studentId, offerType: offerData.offerType, companyId: company.companyId });
     alert(result.message);
     setOfferData({ offerType: "" });
+  };
+
+  const handleCompanyComment = (e) => {
+    e.preventDefault();
+    addCompanyComment({
+      id: Date.now(),
+      sender: company.companyName,
+      text: companyComment,
+      timestamp: new Date().toISOString()
+    });
+    setCompanyComment("");
+    alert("Comment sent to RTB!");
   };
 
   if (!currentUser || currentUser.role !== "company") {
@@ -48,6 +63,22 @@ export default function CompanyDashboard() {
     <div className="page">
       <h1>Company Dashboard for {company.companyName}</h1>
       
+      {/* List of Offered Students */}
+      <div className="section">
+        <h2>Our Offered Students</h2>
+        {myOfferedStudents.length > 0 ? (
+          myOfferedStudents.map(offer => (
+            <div key={offer.student.studentId} className="profile-card">
+              <h3>{offer.student.bothNames}</h3>
+              <p>Offer Type: <strong>{offer.offerType}</strong></p>
+              <p>Student ID: {offer.student.studentId}</p>
+            </div>
+          ))
+        ) : (
+          <p>You have not offered any students yet.</p>
+        )}
+      </div>
+
       {/* Post Job Section */}
       <h2>Post a New Opportunity</h2>
       <form onSubmit={handleJobPostSubmit}>
@@ -82,6 +113,20 @@ export default function CompanyDashboard() {
         />
         <button type="submit">Post Opportunity</button>
       </form>
+
+      {/* Send General Comment */}
+      <div className="section">
+        <h2>Send General Comment to RTB</h2>
+        <form onSubmit={handleCompanyComment}>
+          <textarea
+            placeholder="Your comment..."
+            value={companyComment}
+            onChange={(e) => setCompanyComment(e.target.value)}
+            required
+          />
+          <button type="submit">Send Comment</button>
+        </form>
+      </div>
       
       {/* Approved Student Profiles Section */}
       <h2>Approved Student Profiles</h2>
