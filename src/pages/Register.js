@@ -12,6 +12,7 @@ const roleFields = {
     { name: "photo", label: "Profile Photo (Optional)", type: "file", required: false },
   ],
   school: [
+    { name: "category", label: "School Category", type: "select", required: true, options: ["RP College", "TSS", "VTC"] },
     { name: "schoolName", label: "School Name", type: "text", required: true },
     { name: "email", label: "School Email", type: "email", required: true },
     { name: "schoolId", label: "School ID (e.g., RPcollege)", type: "text", required: true },
@@ -35,7 +36,7 @@ const roleFields = {
 export default function Register() {
   const { role } = useParams();
   const navigate = useNavigate();
-  const { registerUser, users } = useDB();
+  const { registerUser, users, getSchoolFields } = useDB();
   const [formData, setFormData] = useState({});
   const [message, setMessage] = useState("");
 
@@ -52,6 +53,7 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // For school registration, persist category for later student filtering
     const result = registerUser({ role, details: formData });
     if (result.success) {
       setMessage("Account created successfully! You can now log in.");
@@ -66,24 +68,52 @@ export default function Register() {
       <h1>Create {role} Account</h1>
       <form onSubmit={handleSubmit} className="auth-form">
         {role === "student" && (
-          <select name="school" value={formData.school || ""} onChange={handleChange} required>
-            <option value="">Select your School</option>
-            {schools.map(school => (
-              <option key={school.id} value={school.details.schoolName}>
-                {school.details.schoolName}
-              </option>
-            ))}
-          </select>
+          <>
+            {/* Select school category first */}
+            <select name="category" value={formData.category || ""} onChange={handleChange} required>
+              <option value="">Select your School Category</option>
+              <option value="RP College">RP College</option>
+              <option value="TSS">TSS</option>
+              <option value="VTC">VTC</option>
+            </select>
+            {/* Then select a school from registered schools that match category */}
+            <select name="school" value={formData.school || ""} onChange={handleChange} required>
+              <option value="">Select your School</option>
+              {schools
+                .filter(s => (formData.category ? (s.details.category === formData.category) : true))
+                .map(school => (
+                  <option key={school.id} value={school.details.schoolName}>
+                    {school.details.schoolName}
+                  </option>
+                ))}
+            </select>
+          </>
         )}
+
         {roleFields[role] && roleFields[role].map((field) => (
-          <input
-            key={field.name}
-            type={field.type}
-            name={field.name}
-            placeholder={field.label}
-            onChange={handleChange}
-            required={field.required}
-          />
+          field.type === 'select' ? (
+            <select
+              key={field.name}
+              name={field.name}
+              onChange={handleChange}
+              required={field.required}
+              value={formData[field.name] || ''}
+            >
+              <option value="">{field.label}</option>
+              {field.options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              key={field.name}
+              type={field.type}
+              name={field.name}
+              placeholder={field.label}
+              onChange={handleChange}
+              required={field.required}
+            />
+          )
         ))}
         <button type="submit">Create Account</button>
       </form>

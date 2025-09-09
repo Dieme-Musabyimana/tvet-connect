@@ -14,6 +14,7 @@ const initialDB = {
   rtbAnnouncements: [],
   studentFeedback: [],
   companyGeneralChat: [],
+  companySchoolMessages: [], // direct messages from company to a school about an offered student
   rewardedWinners: [],
   applications: [],
   schoolFields: {
@@ -77,6 +78,7 @@ export const DBProvider = ({ children }) => {
     rtbAnnouncements,
     studentFeedback,
     companyGeneralChat,
+    companySchoolMessages,
     rewardedWinners,
     applications,
     schoolFields
@@ -192,7 +194,10 @@ export const DBProvider = ({ children }) => {
     if (studentProfile && company) {
       setDB(prev => ({
         ...prev,
+        // Add to offered
         offeredStudents: [...prev.offeredStudents, { student: studentProfile, company, offerType }],
+        // Remove student's approved profile from approved list (hide from company/student lists)
+        profiles: prev.profiles.filter(p => p.studentId !== studentId),
       }));
       return { success: true, message: `Offer for ${studentProfile.bothNames} sent successfully!` };
     }
@@ -230,6 +235,37 @@ export const DBProvider = ({ children }) => {
   const addCompanyComment = (commentData) => {
     setDB(prev => ({ ...prev, companyGeneralChat: [...prev.companyGeneralChat, { ...commentData, timestamp: Date.now() }] }));
   };
+
+  // Company sends a direct message to the student's school regarding an offer
+  const sendCompanyToSchoolMessage = ({ studentId, text }) => {
+    const student = offeredStudents.find(o => o.student.studentId === studentId)?.student;
+    if (!student) return { success: false, message: 'Student not found among offered.' };
+    const message = {
+      id: Date.now(),
+      schoolName: student.school,
+      studentId,
+      text,
+      companyId: currentUser.details.companyId,
+      companyName: currentUser.details.companyName,
+      timestamp: Date.now()
+    };
+    setDB(prev => ({ ...prev, companySchoolMessages: [...prev.companySchoolMessages, message] }));
+    return { success: true };
+  };
+
+  const getMessagesForSchool = (schoolName) => companySchoolMessages.filter(m => m.schoolName === schoolName);
+
+  // School can reply to a company's message
+  const addSchoolReply = ({ messageId, text }) => {
+    setDB(prev => ({
+      ...prev,
+      companySchoolMessages: prev.companySchoolMessages.map(m => m.id === messageId ? { ...m, schoolResponse: text, schoolResponseTimestamp: Date.now() } : m)
+    }));
+    return { success: true };
+  };
+
+  // Company can view its own messages
+  const getCompanySchoolMessages = (companyId) => companySchoolMessages.filter(m => m.companyId === companyId);
   
   const addRTBAnnouncement = (announcementData) => {
     setDB(prev => ({ ...prev, rtbAnnouncements: [...prev.rtbAnnouncements, announcementData] }));
@@ -363,6 +399,11 @@ export const DBProvider = ({ children }) => {
         getCompanyOfferedStudents,
         getStudentApplications,
         getCompanyApplications, // NEW: Added to context value
+        // Messaging
+        sendCompanyToSchoolMessage,
+        getMessagesForSchool,
+        addSchoolReply,
+        getCompanySchoolMessages,
       }}
     >
       {children}

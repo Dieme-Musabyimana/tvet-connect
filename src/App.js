@@ -10,7 +10,7 @@ import CompanyDashboard from "./pages/CompanyDashboard";
 import RTBDashboard from "./pages/RTBDashboard";
 
 function MainApp() {
-  const { currentUser, logout } = useDB();
+  const { currentUser, logoutUser } = useDB();
 
   return (
     <div className="container">
@@ -19,7 +19,7 @@ function MainApp() {
         {currentUser ? (
           <>
             <Link to={`/dashboard/${currentUser.role}`}>Dashboard</Link>
-            <button onClick={logout}>Logout</button>
+            <button onClick={logoutUser}>Logout</button>
           </>
         ) : (
           <>

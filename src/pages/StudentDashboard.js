@@ -101,7 +101,12 @@ export default function StudentDashboard() {
 
       {/* Student Profile Section */}
       <h2>My Profile</h2>
-      {studentProfile && studentProfile.status === "approved" ? (
+      {isOffered ? (
+        <div className="profile-card">
+          <p><strong>Congratulations!</strong> You have an offer from {offeredPosition.company.companyName} for a {offeredPosition.offerType}.</p>
+          <p>Your profile is no longer editable.</p>
+        </div>
+      ) : studentProfile && studentProfile.status === "approved" ? (
         <div className="profile-card">
           <p>Status: <strong>{studentProfile.status.toUpperCase()}</strong></p>
           <p>Name: {studentProfile.bothNames}</p>

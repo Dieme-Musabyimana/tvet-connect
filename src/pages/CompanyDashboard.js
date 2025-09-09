@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDB } from "../context/InMemoryDB";
 
 export default function CompanyDashboard() {
-  const { currentUser, profiles, createJobPost, offerStudent, jobPosts, addCompanyComment, offeredStudents } = useDB();
+  const { currentUser, profiles, createJobPost, offerStudent, jobPosts, addCompanyComment, offeredStudents, sendCompanyToSchoolMessage, getCompanySchoolMessages } = useDB();
   const company = currentUser?.details;
   const approvedProfiles = profiles.filter(p => p.status === "approved");
   const myOfferedStudents = offeredStudents.filter(o => o.company.companyId === company.companyId);
@@ -19,6 +19,7 @@ export default function CompanyDashboard() {
   });
 
   const [companyComment, setCompanyComment] = useState("");
+  const [schoolMsg, setSchoolMsg] = useState("");
 
   const handleJobPostChange = (e) => {
     const { name, value } = e.target;
@@ -72,10 +73,35 @@ export default function CompanyDashboard() {
               <h3>{offer.student.bothNames}</h3>
               <p>Offer Type: <strong>{offer.offerType}</strong></p>
               <p>Student ID: {offer.student.studentId}</p>
+              <p>School: {offer.student.school}</p>
+              <form onSubmit={(e) => { e.preventDefault(); const res = sendCompanyToSchoolMessage({ studentId: offer.student.studentId, text: schoolMsg }); if(res.success){ setSchoolMsg(""); alert("Message sent to school."); } }}>
+                <input type="text" placeholder={`Message to ${offer.student.school}`} value={schoolMsg} onChange={(e)=>setSchoolMsg(e.target.value)} required />
+                <button type="submit">Send to School</button>
+              </form>
             </div>
           ))
         ) : (
           <p>You have not offered any students yet.</p>
+        )}
+      </div>
+
+      {/* Company ↔ School messages list (for this company) */}
+      <div className="section">
+        <h2>Messages with Schools</h2>
+        {getCompanySchoolMessages(currentUser.details.companyId).length > 0 ? (
+          getCompanySchoolMessages(currentUser.details.companyId).map(msg => (
+            <div key={msg.id} className="profile-card">
+              <p><strong>School:</strong> {msg.schoolName}</p>
+              <p><strong>Student:</strong> {msg.studentId}</p>
+              <p><strong>Your Message:</strong> {msg.text}</p>
+              {msg.schoolResponse && (
+                <p><strong>School Reply:</strong> {msg.schoolResponse}</p>
+              )}
+              <p><em>{new Date(msg.timestamp).toLocaleString()}</em></p>
+            </div>
+          ))
+        ) : (
+          <p>No messages yet.</p>
         )}
       </div>
 

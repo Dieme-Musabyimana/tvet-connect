@@ -22,6 +22,8 @@ export default function RTBDashboard() {
   } = useDB();
 
   const [quizData, setQuizData] = useState({ q: "", a: "", options: "" });
+  const [newField, setNewField] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("");
   const [successStoryData, setSuccessStoryData] = useState({ title: "", text: "", imageUrl: "" });
 
   const handleQuizChange = (e) => {
@@ -174,6 +176,31 @@ export default function RTBDashboard() {
           <input type="text" name="imageUrl" placeholder="Image URL" value={successStoryData.imageUrl} onChange={handleSuccessStoryChange} required />
           <button type="submit">Add Story</button>
         </form>
+      </div>
+
+      {/* RTB: Manage Fields for Any Registered School */}
+      <div className="section">
+        <h2>Manage Fields for Schools</h2>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <select value={selectedSchool} onChange={(e)=>setSelectedSchool(e.target.value)}>
+            <option value="">Select School</option>
+            {users.filter(u=>u.role==='school').map(s => (
+              <option key={s.id} value={s.details.schoolName}>{s.details.schoolName}</option>
+            ))}
+          </select>
+          <input type="text" placeholder="Add new field (e.g., Construction)" value={newField} onChange={(e)=>setNewField(e.target.value)} />
+          <button onClick={() => {
+            if(!selectedSchool || !newField.trim()) return;
+            const schools = JSON.parse(localStorage.getItem('schools')) || {};
+            const list = schools[selectedSchool] || [];
+            if (!list.includes(newField.trim())) {
+              schools[selectedSchool] = [...list, newField.trim()];
+              localStorage.setItem('schools', JSON.stringify(schools));
+              setNewField('');
+              alert('Field added to ' + selectedSchool);
+            }
+          }}>Add Field</button>
+        </div>
       </div>
 
       {/* General Organisation Chat & Announcements */}

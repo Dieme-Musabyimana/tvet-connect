@@ -3,7 +3,7 @@ import { useDB } from "../context/InMemoryDB";
 import GeneralOrgChat from "../components/GeneralOrgChat";
 
 export default function SchoolDashboard() {
-  const { currentUser, profiles, reviewProfile, jobPosts, studentFeedback, addSchoolResponse, addGeneralMessage } = useDB();
+  const { currentUser, profiles, reviewProfile, jobPosts, studentFeedback, addSchoolResponse, addGeneralMessage, getMessagesForSchool, addSchoolReply } = useDB();
   const school = currentUser?.details;
   
   const [declineReason, setDeclineReason] = useState("");
@@ -153,6 +153,29 @@ export default function SchoolDashboard() {
         ))
       ) : (
         <p>No new feedback from your students.</p>
+      )}
+
+      {/* Company messages about offered students */}
+      <h2>Company Messages</h2>
+      {getMessagesForSchool(school.schoolName).length > 0 ? (
+        getMessagesForSchool(school.schoolName).map(msg => (
+          <div key={msg.id} className="profile-card">
+            <p><strong>From Company:</strong> {msg.companyName}</p>
+            <p><strong>Student:</strong> {msg.studentId}</p>
+            <p>{msg.text}</p>
+            {msg.schoolResponse ? (
+              <p><strong>Your Response:</strong> {msg.schoolResponse}</p>
+            ) : (
+              <form onSubmit={(e) => { e.preventDefault(); addSchoolReply({ messageId: msg.id, text: schoolResponse }); setSchoolResponse(""); }}>
+                <input type="text" placeholder="Reply to company..." value={schoolResponse} onChange={(e)=>setSchoolResponse(e.target.value)} required />
+                <button type="submit">Reply</button>
+              </form>
+            )}
+            <p><em>{new Date(msg.timestamp).toLocaleString()}</em></p>
+          </div>
+        ))
+      ) : (
+        <p>No direct messages from companies yet.</p>
       )}
 
       {/* Approved Students Section */}
