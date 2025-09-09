@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DBContext = createContext();
 
@@ -30,8 +30,40 @@ const companyIdRegex = /^[a-zA-Z0-9]+$/;
 export const useDB = () => useContext(DBContext);
 
 export const DBProvider = ({ children }) => {
-  const [db, setDB] = useState(initialDB);
-  const [currentUser, setCurrentUser] = useState(null);
+  // Initialize from localStorage if available
+  const [db, setDB] = useState(() => {
+    try {
+      const stored = localStorage.getItem('tvet_db');
+      return stored ? JSON.parse(stored) : initialDB;
+    } catch (e) {
+      return initialDB;
+    }
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('tvet_current_user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  // Persist to localStorage on changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('tvet_db', JSON.stringify(db));
+    } catch {}
+  }, [db]);
+
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem('tvet_current_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('tvet_current_user');
+      }
+    } catch {}
+  }, [currentUser]);
 
   const {
     users,

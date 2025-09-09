@@ -311,3 +311,70 @@ textarea {
 .stats-text p {
   margin: 0.5rem 0;
 }
+
+/* =============================
+   Interactive Background (Site-wide)
+   ============================= */
+:root {
+  --bg1: #004d40;  /* deep teal */
+  --bg2: #00cc99;  /* accent green */
+  --bg3: #0f2b28;  /* very dark base */
+  --mx: 50%; /* mouse X (%) */
+  --my: 50%; /* mouse Y (%) */
+}
+
+/* Animated, layered background with mouse-follow highlight */
+body {
+  background:
+    radial-gradient(1200px circle at var(--mx) var(--my), rgba(0, 204, 153, 0.10), transparent 60%),
+    linear-gradient(120deg, rgba(0, 77, 64, 0.85), rgba(0, 63, 54, 0.85)),
+    conic-gradient(from 0deg at 50% 50%, #002a25, #003029, #004039, #003029, #002a25);
+  background-size: 100% 100%, 100% 100%, 200% 200%;
+  background-attachment: fixed;
+  animation: bg-rotate 30s linear infinite;
+}
+
+/* Subtle floating glow */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10vmax;
+  background: radial-gradient(closest-side at calc(var(--mx)) calc(var(--my)), rgba(0, 204, 153, 0.18), transparent 70%);
+  filter: blur(48px);
+  transform: translate(calc((var(--mx) - 50%) / 10), calc((var(--my) - 50%) / 10));
+  transition: transform 0.2s ease-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Subtle dotted grid for depth */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes bg-rotate {
+  0% { background-position: center, center, 0% 0%; }
+  100% { background-position: center, center, 100% 100%; }
+}
+
+/* Glassy cards over the dynamic background */
+.page, .section {
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
+  body::before { transition: none; }
+}
