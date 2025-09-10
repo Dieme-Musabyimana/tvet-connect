@@ -148,7 +148,11 @@ export const DBProvider = ({ children }) => {
       return { success: false, message: "Profile cannot be edited once approved or declined." };
     }
 
-    const newProfile = { id: Date.now(), ...profileData, status: "pending", timestamp: Date.now() };
+    // Attach student's photo from their account details if available
+    const studentAccount = users.find(u => u.role === 'student' && u.details.studentId === profileData.studentId);
+    const studentPhoto = studentAccount?.details?.photoData || studentAccount?.file || null;
+
+    const newProfile = { id: Date.now(), ...profileData, studentPhoto, status: "pending", timestamp: Date.now() };
     if (existingProfile) {
       setDB(prev => ({ ...prev, profiles: prev.profiles.map(p => p.id === existingProfile.id ? newProfile : p) }));
     } else {
@@ -205,11 +209,18 @@ export const DBProvider = ({ children }) => {
   };
   
   const addSuccessStory = (storyData) => {
+    // Find if author is an offered student to attach their image
+    let authorImage = null;
+    if (currentUser?.role === 'student') {
+      const offered = offeredStudents.find(o => o.student.studentId === currentUser.details.studentId);
+      authorImage = offered?.student?.studentPhoto || null;
+    }
     const newStory = { 
       id: Date.now(), 
       ...storyData, 
       author: currentUser.details.bothNames || currentUser.details.email, 
       authorRole: currentUser.role,
+      authorImage,
       timestamp: Date.now()
     };
     setDB(prev => ({ ...prev, successStories: [...prev.successStories, newStory] }));

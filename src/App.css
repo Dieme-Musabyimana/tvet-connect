@@ -16,15 +16,17 @@ code {
 
 /* Page Layout */
 .page {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 1rem;
+  max-width: 500%;
   margin: auto;
-  min-height: calc(100vh - 120px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .section {
-  background-color: #fff;
-  padding: 1.5rem;
+  background-color: yellowgreen;
+  padding: 0.3rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
@@ -102,7 +104,7 @@ button:hover {
 /* Forms */
 form {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 1rem;
 }
 
@@ -378,3 +380,150 @@ body::after {
   body { animation: none; }
   body::before { transition: none; }
 }
+
+/* Home page enhancements */
+.page-subtitle {
+  margin-top: -8px;
+  color: #6c757d;
+  font-size: 0.98rem;
+  max-width: 780px;
+}
+
+/* Smaller, modern role buttons */
+.role-buttons { 
+  justify-content: center; 
+  gap: 0.75rem; 
+  margin-top: 1.5rem; 
+}
+.role-buttons button { 
+  background: linear-gradient(135deg, #1e90ff, #00b4d8); 
+  color: #fff; 
+  padding: 0.45rem 0.85rem; 
+  border-radius: 8px; 
+  font-size: 0.9rem; 
+  font-weight: 600; 
+  letter-spacing: 0.2px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12); 
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.3s ease; 
+  flex: 0 0 auto; /* prevent stretching */
+}
+.role-buttons button:hover { 
+  transform: translateY(-1px); 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.18); 
+}
+
+/* Connect and social buttons refinement */
+.connect-buttons button, .social-media-buttons button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.12s ease;
+}
+.connect-buttons button:hover, .social-media-buttons button:hover {
+  background-color: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+/* Horizontal section grid for cards */
+.section.horizontal .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* Stat cards and images styling for a clean look */
+.stats-grid .stat-card {
+  text-align: center;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+}
+.image-card {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 6px 20px rgba(17, 24, 39, 0.08);
+}
+
+/* Heading accents */
+.page h1, .page h2 { color: #0056b3; }
+
+/* Utility flex row */
+.flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* RTB dashboard layout polish */
+.rtb-page .rtb-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
+.rtb-page .section { background: linear-gradient(180deg, #ffffff, #fbfdff); }
+.rtb-page .profile-card { background: #fff; border: 1px solid #edf2f7; }
+
+/* RTB hero header */
+.hero-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.rtb-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+.hero-text h1 { margin: 0; }
+
+/* Career section flex */
+.career-flex {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.career-text { flex: 1 1 380px; min-width: 320px; }
+.career-image { flex: 1 1 360px; min-width: 300px; display: flex; }
+.career-image img {
+  width: 100%;
+  height: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* Career module UI (expanded + bilingual + hero) */
+.career-module { display: flex; flex-direction: column; gap: 0.9rem; }
+.career-bilingual { display:flex; flex-direction:column; gap: .25rem; }
+.career-title, .career-title-kin { font-size: 2rem; margin: 0; line-height: 1.2; }
+@media (min-width: 768px) { .career-title, .career-title-kin { font-size: 2.4rem; } }
+.career-subtitle-lg, .career-subtitle-kin { font-size: 1.05rem; margin: 0; }
+@media (min-width: 768px) { .career-subtitle-lg, .career-subtitle-kin { font-size: 1.15rem; } }
+.career-choices { background: #fff; border: 1px solid #edf2f7; border-radius: 10px; padding: 0.75rem; }
+.choice-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.choice-btn { background: #e9f2ff; color: #0b5ed7; border: 1px solid #cfe2ff; padding: 0.5rem 0.8rem; border-radius: 999px; cursor: pointer; font-weight:600; }
+.choice-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+.school-select { display: flex; flex-direction: column; gap: 0.5rem; }
+.school-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+.school-card { background: #ffffff; border: 1px solid #edf2f7; border-radius: 10px; padding: 0.9rem; cursor: pointer; transition: transform .12s ease, box-shadow .2s ease; }
+.school-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(17,24,39,.08); }
+.school-card.active { outline: 2px solid #0d6efd; }
+.school-name { font-weight: 700; color: #0d6efd; }
+.school-sub { font-size: .9rem; color: #475569; }
+.school-results { display: flex; flex-direction: column; gap: 1rem; }
+.results-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.result-block { background: #fff; border: 1px solid #edf2f7; border-radius: 12px; padding: 1rem; }
+
+/* Career hero with background image */
+.career-hero { position: relative; background-image: url('https://images.unsplash.com/photo-1569144157591-c60f3f82f137?q=80&w=1400&auto=format&fit=crop'); background-size: cover; background-position: center; border-radius: 12px; overflow: hidden; }
+.career-hero-overlay { background: rgba(0,0,0,0.35); padding: 1rem; }
+.career-hero-text { color: #fff; margin-bottom: .5rem; }
+.career-hero-body { background: rgba(255,255,255,0.9); border-radius: 10px; padding: .75rem; }
+.career-title, .career-title-kin { color: #fff; }
+.career-subtitle-lg, .career-subtitle-kin { color: #e7f1ff; }
+
+/* Full-height pages (fit the whole screen) */
+html, body, #root { height: 100%; }
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+.section { width: 100%; }

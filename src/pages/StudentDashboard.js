@@ -77,9 +77,19 @@ export default function StudentDashboard() {
 
   const handleStorySubmit = (e) => {
     e.preventDefault();
-    addSuccessStory(storyData);
-    setStoryData({ title: "", text: "", photo: null, file: null });
-    alert("Success story shared!");
+    if (storyData.photo) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        addSuccessStory({ ...storyData, imageUrl: reader.result });
+        setStoryData({ title: "", text: "", photo: null, file: null });
+        alert("Success story shared!");
+      };
+      reader.readAsDataURL(storyData.photo);
+    } else {
+      addSuccessStory(storyData);
+      setStoryData({ title: "", text: "", photo: null, file: null });
+      alert("Success story shared!");
+    }
   };
 
   const handleApply = (jobPostId) => {

@@ -65,24 +65,26 @@ export default function CompanyDashboard() {
       <h1>Company Dashboard for {company.companyName}</h1>
       
       {/* List of Offered Students */}
-      <div className="section">
+      <div className="section horizontal">
         <h2>Our Offered Students</h2>
-        {myOfferedStudents.length > 0 ? (
-          myOfferedStudents.map(offer => (
-            <div key={offer.student.studentId} className="profile-card">
-              <h3>{offer.student.bothNames}</h3>
-              <p>Offer Type: <strong>{offer.offerType}</strong></p>
-              <p>Student ID: {offer.student.studentId}</p>
-              <p>School: {offer.student.school}</p>
-              <form onSubmit={(e) => { e.preventDefault(); const res = sendCompanyToSchoolMessage({ studentId: offer.student.studentId, text: schoolMsg }); if(res.success){ setSchoolMsg(""); alert("Message sent to school."); } }}>
-                <input type="text" placeholder={`Message to ${offer.student.school}`} value={schoolMsg} onChange={(e)=>setSchoolMsg(e.target.value)} required />
-                <button type="submit">Send to School</button>
-              </form>
-            </div>
-          ))
-        ) : (
-          <p>You have not offered any students yet.</p>
-        )}
+        <div className="grid">
+          {myOfferedStudents.length > 0 ? (
+            myOfferedStudents.map(offer => (
+              <div key={offer.student.studentId} className="profile-card">
+                <h3>{offer.student.bothNames}</h3>
+                <p><strong>Offer Type:</strong> {offer.offerType}</p>
+                <p><strong>Student ID:</strong> {offer.student.studentId}</p>
+                <p><strong>School:</strong> {offer.student.school}</p>
+                <form onSubmit={(e) => { e.preventDefault(); const res = sendCompanyToSchoolMessage({ studentId: offer.student.studentId, text: schoolMsg }); if(res.success){ setSchoolMsg(""); alert("Message sent to school."); } }}>
+                  <input type="text" placeholder={`Message to ${offer.student.school}`} value={schoolMsg} onChange={(e)=>setSchoolMsg(e.target.value)} required />
+                  <button type="submit">Send to School</button>
+                </form>
+              </div>
+            ))
+          ) : (
+            <p>You have not offered any students yet.</p>
+          )}
+        </div>
       </div>
 
       {/* Company ↔ School messages list (for this company) */}
@@ -183,19 +185,23 @@ export default function CompanyDashboard() {
 
       {/* Your Posted Opportunities Section */}
       <h2>Your Posted Opportunities</h2>
-      {jobPosts.filter(post => post.companyId === company.companyId).length > 0 ? (
-        jobPosts
-          .filter(post => post.companyId === company.companyId)
-          .map(post => (
-            <div key={post.id} className="profile-card">
-              <h3>{post.position} ({post.type})</h3>
-              <p>{post.description}</p>
-              <p>Skills: {post.requiredSkills}</p>
-            </div>
-          ))
-      ) : (
-        <p>You have not posted any opportunities yet.</p>
-      )}
+      <div className="section horizontal">
+        <div className="grid">
+          {jobPosts.filter(post => post.companyId === company.companyId).length > 0 ? (
+            jobPosts
+              .filter(post => post.companyId === company.companyId)
+              .map(post => (
+                <div key={post.id} className="profile-card">
+                  <h3>{post.position} ({post.type})</h3>
+                  <p>{post.description}</p>
+                  <p><strong>Skills:</strong> {post.requiredSkills}</p>
+                </div>
+              ))
+          ) : (
+            <p>You have not posted any opportunities yet.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDB } from "../context/InMemoryDB";
 import GeneralOrgChat from "../components/GeneralOrgChat";
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function RTBDashboard() {
   const { 
@@ -77,8 +77,13 @@ export default function RTBDashboard() {
   const COLORS = ['#FFBB28', '#00C49F', '#8884d8'];
 
   return (
-    <div className="page">
-      <h1>RTB Dashboard</h1>
+    <div className="page rtb-page">
+      <div className="rtb-header">
+        <h1>RTB Dashboard</h1>
+        <div className="rtb-quick-actions">
+          <a href="#manage-fields" className="nav-button">Manage Fields</a>
+        </div>
+      </div>
 
       {/* Statistics Section */}
       <div className="section">
@@ -97,24 +102,26 @@ export default function RTBDashboard() {
       <div className="section">
         <h2>Job Market Overview</h2>
         <p>This graph compares the number of students seeking offers, available opportunities, and students who have already received offers.</p>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <PieChart width={400} height={400}>
-            <Pie
-              dataKey="value"
-              data={pieChartData}
-              cx="50%"
-              cy="50%"
-              outerRadius={150}
-              fill="#8884d8"
-              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-            >
-              {pieChartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: 360 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                dataKey="value"
+                data={pieChartData && pieChartData.length ? pieChartData : [{ name: 'No data', value: 1 }]}
+                cx="50%"
+                cy="50%"
+                outerRadius={140}
+                fill="#8884d8"
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+              >
+                {(pieChartData && pieChartData.length ? pieChartData : [{ name: 'No data', value: 1 }]).map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
         <div className="stats-text">
             <p><strong>Students Seeking Offers:</strong> {marketStats.studentsSeekingOffers}</p>
@@ -129,8 +136,8 @@ export default function RTBDashboard() {
         {applications.length > 0 ? (
           applications.map(app => (
             <div key={app.id} className="profile-card">
-              <h3>{app.studentProfile.bothNames}</h3>
-              <p>Applied for: {app.jobPost.position} at {app.jobPost.companyName}</p>
+              <h3>{app.studentProfile?.bothNames || app.studentId}</h3>
+              <p>Applied for: {app.jobPost?.position || app.jobPostId} at {app.jobPost?.companyName || 'Unknown'}</p>
               <p>Status: {app.status}</p>
             </div>
           ))
@@ -179,9 +186,9 @@ export default function RTBDashboard() {
       </div>
 
       {/* RTB: Manage Fields for Any Registered School */}
-      <div className="section">
+      <div className="section" id="manage-fields">
         <h2>Manage Fields for Schools</h2>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div className="flex-row">
           <select value={selectedSchool} onChange={(e)=>setSelectedSchool(e.target.value)}>
             <option value="">Select School</option>
             {users.filter(u=>u.role==='school').map(s => (

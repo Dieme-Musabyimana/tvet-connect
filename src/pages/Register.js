@@ -45,7 +45,15 @@ export default function Register() {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "photo") {
-      setFormData({ ...formData, [name]: files[0] });
+      const file = files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // Store preview as base64 so it persists and can be displayed later
+          setFormData({ ...formData, photo: file, photoData: reader.result });
+        };
+        reader.readAsDataURL(file);
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }

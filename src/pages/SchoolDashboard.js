@@ -3,7 +3,7 @@ import { useDB } from "../context/InMemoryDB";
 import GeneralOrgChat from "../components/GeneralOrgChat";
 
 export default function SchoolDashboard() {
-  const { currentUser, profiles, reviewProfile, jobPosts, studentFeedback, addSchoolResponse, addGeneralMessage, getMessagesForSchool, addSchoolReply } = useDB();
+  const { currentUser, profiles, reviewProfile, jobPosts, studentFeedback, addSchoolResponse, addGeneralMessage, getMessagesForSchool, addSchoolReply, getSchoolOfferedStudents } = useDB();
   const school = currentUser?.details;
   
   const [declineReason, setDeclineReason] = useState("");
@@ -177,6 +177,23 @@ export default function SchoolDashboard() {
       ) : (
         <p>No direct messages from companies yet.</p>
       )}
+
+      {/* Offered Students Section for School */}
+      <h2>Our Offered Students</h2>
+      {getSchoolOfferedStudents ? (
+        getSchoolOfferedStudents(school.schoolName).length > 0 ? (
+          getSchoolOfferedStudents(school.schoolName).map((o, idx) => (
+            <div key={idx} className="profile-card">
+              <h3>{o.student.bothNames}</h3>
+              <p><strong>Student ID:</strong> {o.student.studentId}</p>
+              <p><strong>Offer Type:</strong> {o.offerType}</p>
+              <p><strong>Offered By:</strong> {o.company.companyName}</p>
+            </div>
+          ))
+        ) : (
+          <p>No offered students yet.</p>
+        )
+      ) : null}
 
       {/* Approved Students Section */}
       <h2>Approved Students from Our School</h2>
