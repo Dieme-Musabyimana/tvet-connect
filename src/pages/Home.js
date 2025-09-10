@@ -21,12 +21,18 @@ const socialMediaLinks = [
 ];
 
 function CareerPathFinder({ users, offeredStudents, successStories }) {
+  const { schoolFields, sendMessageToStudent, getMessagesForStudent } = useDB();
   const [query, setQuery] = useState("");
   const [selectedField, setSelectedField] = useState("");
   const [selectedSchool, setSelectedSchool] = useState("");
+  const [activeChat, setActiveChat] = useState(null); // studentId for chat box open
+  const [chatText, setChatText] = useState("");
 
-  // Build school->fields map from localStorage 'schools'
-  const schoolsMap = useMemo(() => JSON.parse(localStorage.getItem('schools')) || {}, []);
+  // Build school->fields map from DB (fallback to localStorage 'schools' if present)
+  const schoolsMap = useMemo(() => {
+    const ls = (() => { try { return JSON.parse(localStorage.getItem('schools')) || {}; } catch { return {}; } })();
+    return Object.keys(schoolFields || {}).length ? schoolFields : ls;
+  }, [schoolFields]);
 
   const allFields = useMemo(() => {
     const set = new Set();
@@ -40,12 +46,20 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
     return allFields.filter(f => f.toLowerCase().includes(q));
   }, [query, allFields]);
 
+  const fieldsToShow = query.trim() ? matchingFields : allFields;
+
   const schoolsOfferingSelected = useMemo(() => {
     if (!selectedField) return [];
     return Object.entries(schoolsMap)
       .filter(([schoolName, fields]) => (fields || []).includes(selectedField))
       .map(([schoolName]) => schoolName);
   }, [selectedField, schoolsMap]);
+
+  const schoolContacts = useMemo(() => {
+    const map = {};
+    users.filter(u => u.role === 'school').forEach(s => { map[s.details.schoolName] = s.details.contactNumber || 'N/A'; });
+    return map;
+  }, [users]);
 
   const offeredFromSelectedSchool = useMemo(() => {
     if (!selectedSchool) return [];
@@ -58,27 +72,39 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
     return successStories.filter(story => offeredNames.has(story.author));
   }, [successStories, offeredFromSelectedSchool]);
 
+  const handleSendChat = (studentId) => {
+    if (!chatText.trim()) return;
+    sendMessageToStudent({ studentId, text: chatText.trim(), from: 'public' });
+    setChatText("");
+  };
+
   return (
     <div className="career-module">
-      {/* Bilingual prompt and direct selection (no typing) */}
+      {/* Bilingual prompt and direct selection */}
       <div className="career-bilingual">
         <p className="career-subtitle-lg">Choose your favorite career from fields offered by schools. We’ll show you schools, offered students, and success stories.</p>
         <p className="career-subtitle-kin">Hitamo umwuga ukunda mu masomo atangwa n’amashuri. Tuzakwereka amashuri, abanyeshuri bahawe amasezerano, n’inkuru z’intsinzi.</p>
       </div>
 
-      {/* All available fields as choices */}
+      {/* Search + manual selection */}
       <div className="career-choices">
         <h4>Available Fields</h4>
-        {allFields.length > 0 ? (
+        <input
+          type="text"
+          placeholder="Search dream career... (e.g., Construction, IT)"
+          value={query}
+          onChange={(e)=>setQuery(e.target.value)}
+        />
+        {fieldsToShow.length > 0 ? (
           <div className="choice-list">
-            {allFields.map(f => (
+            {fieldsToShow.map(f => (
               <button key={f} className={`choice-btn ${selectedField===f? 'active':''}`} onClick={()=>{ setSelectedField(f); setSelectedSchool(""); }}>
                 {f}
               </button>
             ))}
           </div>
         ) : (
-          <p>No fields available yet. RTB and schools can add fields in their dashboards.</p>
+          <p>No matching fields.</p>
         )}
       </div>
 
@@ -91,7 +117,7 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
               {schoolsOfferingSelected.map(s => (
                 <div key={s} className={`school-card ${selectedSchool===s?'active':''}`} onClick={()=>setSelectedSchool(s)}>
                   <div className="school-name">{s}</div>
-                  <div className="school-sub">Join these schools to make your dreams come true — explore offered students and success stories</div>
+                  <div className="school-sub">Contact: {schoolContacts[s] || 'N/A'}</div>
                 </div>
               ))}
             </div>
@@ -116,15 +142,34 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
             <div className="result-block">
               <h5>Students with Offers</h5>
               {offeredFromSelectedSchool.length > 0 ? (
-                offeredFromSelectedSchool.map((offer, idx) => (
-                  <div key={idx} className="profile-card">
-                    {offer.student.studentPhoto && (
-                      <img src={offer.student.studentPhoto} alt={offer.student.bothNames} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
-                    )}
-                    <p><strong>{offer.student.bothNames}</strong> — {offer.offerType} at <strong>{offer.company.companyName}</strong></p>
-                    <p>Phone: {offer.student.phone || 'N/A'}</p>
-                  </div>
-                ))
+                offeredFromSelectedSchool.map((offer, idx) => {
+                  const messages = getMessagesForStudent(offer.student.studentId);
+                  return (
+                    <div key={idx} className="profile-card">
+                      {offer.student.studentPhoto && (
+                        <img src={offer.student.studentPhoto} alt={offer.student.bothNames} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                      )}
+                      <p><strong>{offer.student.bothNames}</strong> — {offer.offerType} at <strong>{offer.company.companyName}</strong></p>
+                      <p>Phone: {offer.student.phone || 'N/A'}</p>
+                      <button onClick={()=> setActiveChat(activeChat===offer.student.studentId? null : offer.student.studentId)}>
+                        {activeChat===offer.student.studentId ? 'Close Chat' : 'Chat'}
+                      </button>
+                      {activeChat===offer.student.studentId && (
+                        <div className="chat-container" style={{height: 240}}>
+                          <div className="chat-display">
+                            {messages.map(m => (
+                              <div key={m.id} className="chat-message"><strong>{m.from}:</strong> {m.text}</div>
+                            ))}
+                          </div>
+                          <form onSubmit={(e)=>{ e.preventDefault(); handleSendChat(offer.student.studentId); }} className="chat-form">
+                            <input type="text" placeholder="Type a message..." value={chatText} onChange={(e)=>setChatText(e.target.value)} />
+                            <button type="submit">Send</button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               ) : (
                 <p>No students from this school have received offers yet.</p>
               )}
@@ -291,7 +336,7 @@ export default function Home() {
         {roles.map((role) => (
           <button key={role.path} onClick={() => navigate(`/login/${role.path}`)}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 18, lineHeight: 0 }}>{role.icon}</span>
+              <span style={{ fontSize: 16, lineHeight: 0 }}>{role.icon}</span>
               <span>{role.name}</span>
             </span>
           </button>

@@ -23,7 +23,7 @@ code {
   padding-left: 0;
   padding-right: 0;
   padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-bottom: 3.5rem; /* space for bottom role buttons */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -330,40 +330,28 @@ textarea {
   --my: 50%; /* mouse Y (%) */
 }
 
-/* Animated, layered background with mouse-follow highlight */
+/* Disable interactive background for a clean look */
 body {
-  background:
-    radial-gradient(1200px circle at var(--mx) var(--my), rgba(0, 204, 153, 0.10), transparent 60%),
-    linear-gradient(120deg, rgba(0, 77, 64, 0.85), rgba(0, 63, 54, 0.85)),
-    conic-gradient(from 0deg at 50% 50%, #002a25, #003029, #004039, #003029, #002a25);
-  background-size: 100% 100%, 100% 100%, 200% 200%;
-  background-attachment: fixed;
-  animation: bg-rotate 30s linear infinite;
+  background: #ffffff;
+  animation: none;
+  background-attachment: scroll;
+  background-image: none;
 }
 
 /* Subtle floating glow */
 body::before {
-  content: "";
-  position: fixed;
-  inset: -10vmax;
-  background: radial-gradient(closest-side at calc(var(--mx)) calc(var(--my)), rgba(0, 204, 153, 0.18), transparent 70%);
-  filter: blur(48px);
-  transform: translate(calc((var(--mx) - 50%) / 10), calc((var(--my) - 50%) / 10));
-  transition: transform 0.2s ease-out;
-  pointer-events: none;
-  z-index: -1;
+  content: none !important;
+  background: none !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 /* Subtle dotted grid for depth */
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.45;
-  pointer-events: none;
-  z-index: -1;
+  content: none !important;
+  background-image: none !important;
+  opacity: 0 !important;
 }
 
 @keyframes bg-rotate {
@@ -371,13 +359,13 @@ body::after {
   100% { background-position: center, center, 100% 100%; }
 }
 
-/* Glassy cards over the dynamic background */
+/* Page containers over plain background */
 .page, .section {
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  backdrop-filter: blur(10px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: none;
+  box-shadow: none;
 }
 
 /* Respect reduced motion */
@@ -394,27 +382,39 @@ body::after {
   max-width: 780px;
 }
 
-/* Smaller, modern role buttons */
+/* Smaller, modern role buttons - pinned bottom, horizontal */
 .role-buttons { 
+  position: fixed; 
+  left: 0;
+  right: 0;
+  bottom: 0; 
+  display: flex;
+  flex-direction: row; /* force horizontal */
+  flex-wrap: wrap;
   justify-content: center; 
-  gap: 0.75rem; 
-  margin-top: 1.5rem; 
+  align-items: center;
+  gap: 0.5rem; 
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  border-top: 1px solid #edf2f7;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  z-index: 1000;
 }
 .role-buttons button { 
   background: linear-gradient(135deg, #1e90ff, #00b4d8); 
   color: #fff; 
-  padding: 0.45rem 0.85rem; 
+  padding: 0.35rem 0.7rem; /* smaller */
   border-radius: 8px; 
-  font-size: 0.9rem; 
+  font-size: 0.85rem; /* smaller */
   font-weight: 600; 
   letter-spacing: 0.2px; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12); 
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12); 
   transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.3s ease; 
   flex: 0 0 auto; /* prevent stretching */
 }
 .role-buttons button:hover { 
   transform: translateY(-1px); 
-  box-shadow: 0 6px 14px rgba(0,0,0,0.18); 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18); 
 }
 
 /* Connect and social buttons refinement */
@@ -530,13 +530,27 @@ body::after {
 .career-title, .career-title-kin { color: #0b1324; }
 .career-subtitle-lg, .career-subtitle-kin { color: #1f2937; }
 
-/* Home blocks grid */
-.block-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(260px, 1fr); gap: 0.75rem; }
+/* Home blocks grid - fill page height */
+.block-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(260px, 1fr); gap: 0.75rem; height: calc(100vh - 160px); }
 .block { position: relative; padding: 0.75rem; border-radius: 12px; overflow: hidden; color: #0f172a; display:flex; flex-direction: column; background-size: cover; background-position: center; }
 .block-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: .5rem; }
 .block-expand, .block-close { background: rgba(0,0,0,0.65); color:#fff; border:none; border-radius:8px; padding: .25rem .5rem; cursor:pointer; }
 .block-grid.expanded .block:not(.expanded) { display: none; }
 .block.expanded { grid-column: 1/-1; grid-row: 1/span 2; min-height: calc(100vh - 160px); }
+
+/* Full-width alignment for navbar and header */
+.navbar { width: 100%; margin: 0; padding-left: 0; padding-right: 0; }
+.hero-header { width: 100%; margin: 0; }
+
+/* Responsive grid behavior */
+@media (max-width: 1200px) {
+  .block-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .block-grid { grid-template-columns: 1fr; }
+  .page { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .navbar { padding-left: 0.75rem; padding-right: 0.75rem; }
+}
 
 /* Unique backgrounds per block - remove photos and use solid, interesting colors */
 .block-welcome { background: linear-gradient(135deg, #e3f2fd, #e0f7fa); }

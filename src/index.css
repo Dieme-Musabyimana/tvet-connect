@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f8f8fa;
+  background: red;
   margin: 0;
 }
 
@@ -46,8 +46,10 @@ nav button {
 
 .role-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  flex-direction: row; /* horizontal */
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 .role-buttons button {

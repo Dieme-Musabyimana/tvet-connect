@@ -17,6 +17,7 @@ const initialDB = {
   companySchoolMessages: [], // direct messages from company to a school about an offered student
   rewardedWinners: [],
   applications: [],
+  studentMessages: [], // direct chats with offered students (public or logged-in users)
   schoolFields: {
     'TVETSchoolA': ['Electrical Engineering', 'Automotive Mechanics', 'Culinary Arts'],
     'TVETSchoolB': ['Information Technology', 'Plumbing', 'Construction'],
@@ -81,6 +82,7 @@ export const DBProvider = ({ children }) => {
     companySchoolMessages,
     rewardedWinners,
     applications,
+    studentMessages,
     schoolFields
   } = db;
 
@@ -278,6 +280,14 @@ export const DBProvider = ({ children }) => {
   // Company can view its own messages
   const getCompanySchoolMessages = (companyId) => companySchoolMessages.filter(m => m.companyId === companyId);
   
+  // Simple student chat storage
+  const sendMessageToStudent = ({ studentId, text, from }) => {
+    const msg = { id: Date.now(), studentId, text, from, timestamp: Date.now() };
+    setDB(prev => ({ ...prev, studentMessages: [...prev.studentMessages, msg] }));
+    return { success: true };
+  };
+  const getMessagesForStudent = (studentId) => studentMessages.filter(m => m.studentId === studentId).sort((a,b)=>a.timestamp-b.timestamp);
+  
   const addRTBAnnouncement = (announcementData) => {
     setDB(prev => ({ ...prev, rtbAnnouncements: [...prev.rtbAnnouncements, announcementData] }));
   };
@@ -415,6 +425,9 @@ export const DBProvider = ({ children }) => {
         getMessagesForSchool,
         addSchoolReply,
         getCompanySchoolMessages,
+        // Student chat
+        sendMessageToStudent,
+        getMessagesForStudent,
       }}
     >
       {children}
