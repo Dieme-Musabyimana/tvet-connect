@@ -159,14 +159,19 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
 export default function Home() {
   const navigate = useNavigate();
   const { offeredStudents, successStories, users } = useDB();
+  const [expanded, setExpanded] = useState(""); // which block is expanded
+
+  const expand = (id) => setExpanded(id);
+  const close = () => setExpanded("");
+  const isExpanded = (id) => expanded === id;
 
   return (
     <div className="page">
-      {/* RTB Logo/Header */}
+      {/* RTB Logo/Header - logo first */}
       <div className="hero-header">
         <img
           className="rtb-logo"
-          src="tvet/public/rwanda-tvet-board-rtb-466854.png"
+          src="/rwanda-tvet-board-rtb-466854.png"
           alt="Rwanda TVET Board Logo"
         />
         <div className="hero-text">
@@ -175,106 +180,113 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Find Your Career Path Section with background image and bilingual text */}
-      <div className="section career-hero">
-        <div className="career-hero-overlay">
-          <div className="career-hero-text">
-            <h2 className="career-title">Find Your Career Path</h2>
-            <h2 className="career-title-kin">Shakisha Inzira y’Umwuga Wawe</h2>
-            <p className="career-subtitle-lg">What’s your dream career? Pick a field to discover matching schools, offered students, and success stories.</p>
-            <p className="career-subtitle-kin">Ni uwuhe mwuga w’inzozi zawe? Hitamo isomo, urebe amashuri, abanyeshuri bahawe amasezerano, n’inkuru z’intsinzi.</p>
+      {/* Blocks Grid (2 rows x 3 columns) */}
+      <div className={`block-grid ${expanded ? 'expanded' : ''}`}>
+        {/* Row 1 */}
+        <div className={`block block-welcome ${isExpanded('welcome') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>Welcome to TVET Connect</h2>
+            {!isExpanded('welcome') && <button className="block-expand" onClick={() => expand('welcome')}>Expand</button>}
+            {isExpanded('welcome') && <button className="block-close" onClick={close}>Close</button>}
           </div>
-          <div className="career-hero-body">
-            <CareerPathFinder users={users} offeredStudents={offeredStudents} successStories={successStories} />
+          {/* Find Your Career Path inside the welcome block */}
+          <div className="career-hero-overlay">
+            <div className="career-hero-text">
+              <h3 className="career-title">Find Your Career Path</h3>
+              <h3 className="career-title-kin">Shakisha Inzira y’Umwuga Wawe</h3>
+              <p className="career-subtitle-lg">What’s your dream career? Pick a field to discover matching schools, offered students, and success stories.</p>
+              <p className="career-subtitle-kin">Ni uwuhe mwuga w’inzozi zawe? Hitamo isomo, urebe amashuri, abanyeshuri bahawe amasezerano, n’inkuru z’intsinzi.</p>
+            </div>
+            <div className="career-hero-body">
+              <CareerPathFinder users={users} offeredStudents={offeredStudents} successStories={successStories} />
+            </div>
+          </div>
+        </div>
+
+        <div className={`block block-market ${isExpanded('market') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>TVET Job Market Insights</h2>
+            {!isExpanded('market') && <button className="block-expand" onClick={() => expand('market')}>Expand</button>}
+            {isExpanded('market') && <button className="block-close" onClick={close}>Close</button>}
+          </div>
+          <HomeStats />
+        </div>
+
+        <div className={`block block-gallery ${isExpanded('gallery') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>Rwanda TVET in Pictures</h2>
+            {!isExpanded('gallery') && <button className="block-expand" onClick={() => expand('gallery')}>Expand</button>}
+            {isExpanded('gallery') && <button className="block-close" onClick={close}>Close</button>}
+          </div>
+          <div className="image-grid">
+            <div className="image-card"><div className="image-overlay">Hands-on technical training</div></div>
+            <div className="image-card"><div className="image-overlay">Workshop and practicals</div></div>
+            <div className="image-card"><div className="image-overlay">Skills for the future</div></div>
+            <div className="image-card"><div className="image-overlay">STEM and innovation</div></div>
+          </div>
+        </div>
+
+        {/* Row 2 */}
+        <div className={`block block-quiz ${isExpanded('quiz') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>TVET Quiz for Prizes!</h2>
+            {!isExpanded('quiz') && <button className="block-expand" onClick={() => expand('quiz')}>Expand</button>}
+            {isExpanded('quiz') && <button className="block-close" onClick={close}>Close</button>}
+          </div>
+          <p>Answer questions about TVET and get a chance to win 200 RWF!</p>
+          <Quiz />
+        </div>
+
+        <div className={`block block-offers ${isExpanded('offers') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>Students with Offers</h2>
+            {!isExpanded('offers') && <button className="block-expand" onClick={() => expand('offers')}>Expand</button>}
+            {isExpanded('offers') && <button className="block-close" onClick={close}>Close</button>}
+          </div>
+          <div className="grid">
+            {offeredStudents.length > 0 ? (
+              offeredStudents.map((offer, index) => (
+                <div key={index} className="profile-card">
+                  {offer.student.studentPhoto && (
+                    <img src={offer.student.studentPhoto} alt={offer.student.bothNames} style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover' }} />
+                  )}
+                  <h3>{offer.student.bothNames}</h3>
+                  <p>Offered a <strong>{offer.offerType}</strong> by <strong>{offer.company.companyName}</strong></p>
+                </div>
+              ))
+            ) : (
+              <p>No students have received offers yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className={`block block-stories ${isExpanded('stories') ? 'expanded' : ''}`}>
+          <div className="block-header">
+            <h2>Success Stories</h2>
+            {!isExpanded('stories') && <button className="block-expand" onClick={() => expand('stories')}>Expand</button>}
+            {isExpanded('stories') && <button className="block-close" onClick={close}>Close</button>}
+          </div>
+          <div className="grid">
+            {successStories.length > 0 ? (
+              successStories.map(story => (
+                <div key={story.id} className="profile-card">
+                  {story.authorImage && (
+                    <img src={story.authorImage} alt={story.author} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />
+                  )}
+                  <h3>{story.title}</h3>
+                  <p>by {story.author}</p>
+                  <p>{story.text}</p>
+                  {story.imageUrl && <img src={story.imageUrl} alt="Success Story" style={{ maxWidth: "100%", height: "auto" }} />}
+                </div>
+              ))
+            ) : (
+              <p>No success stories available yet.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Home Stats Section */}
-      <div className="section">
-        <HomeStats />
-      </div>
-
-      {/* Quiz Section */}
-      <div className="section">
-        <h2>TVET Quiz for Prizes!</h2>
-        <p>Answer questions about TVET and get a chance to win 200 RWF!</p>
-        <Quiz />
-      </div>
-
-      {/* Role Buttons moved to bottom as requested */}
-
-      {/* Offered Students Section */}
-      <div className="section horizontal">
-        <h2>Students with Offers</h2>
-        <div className="grid">
-          {offeredStudents.length > 0 ? (
-            offeredStudents.map((offer, index) => (
-              <div key={index} className="profile-card">
-                {offer.student.studentPhoto && (
-                  <img src={offer.student.studentPhoto} alt={offer.student.bothNames} style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover' }} />
-                )}
-                <h3>{offer.student.bothNames}</h3>
-                <p>Offered a <strong>{offer.offerType}
-                </strong> by <strong>{offer.company.companyName}</strong></p>
-              </div>
-            ))
-          ) : (
-            <p>No students have received offers yet.</p>
-          )}
-        </div>
-      </div>
-
-      {/* Success Stories Section */}
-      <div className="section horizontal">
-        <h2>Success Stories</h2>
-        <div className="grid">
-          {successStories.length > 0 ? (
-            successStories.map(story => (
-              <div key={story.id} className="profile-card">
-                {story.authorImage && (
-                  <img src={story.authorImage} alt={story.author} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />
-                )}
-                <h3>{story.title}</h3>
-                <p>by {story.author}</p>
-                <p>{story.text}</p>
-                {story.imageUrl && <img src={story.imageUrl} alt="Success Story" style={{ maxWidth: "100%", height: "auto" }} />}
-              </div>
-            ))
-          ) : (
-            <p>No success stories available yet.</p>
-          )}
-        </div>
-      </div>
-
-      {/* Contact and Social Media Section */}
-      <div className="section">
-        <h2>Connect With Us</h2>
-        <div className="connect-buttons-container">
-          <div className="connect-buttons">
-            <a href="https://wa.me/250786862261" target="_blank" rel="noopener noreferrer">
-              <button>Meet with a Mentor at RTB</button>
-            </a>
-            <a href="https://wa.me/250782763011" target="_blank" rel="noopener noreferrer">
-              <button>Meet with Alumni Member</button>
-            </a>
-            <a href="https://chat.whatsapp.com/Jd1820626" target="_blank" rel="noopener noreferrer">
-              <button>Join Our WhatsApp Group</button>
-            </a>
-          </div>
-          <div className="social-media-buttons">
-            {socialMediaLinks.map(platform => (
-              <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer">
-                <button>
-                  {platform.icon} {platform.name}
-                </button>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Role Buttons moved to bottom as requested */}
+      {/* Role Buttons moved to bottom */}
       <div className="role-buttons">
         {roles.map((role) => (
           <button key={role.path} onClick={() => navigate(`/login/${role.path}`)}>

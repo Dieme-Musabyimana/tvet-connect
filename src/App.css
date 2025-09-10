@@ -17,7 +17,7 @@ code {
 /* Page Layout */
 .page {
   padding: 1rem;
-  max-width: 500%;
+  max-width: 1200px;
   margin: auto;
   min-height: 100vh;
   display: flex;
@@ -25,11 +25,11 @@ code {
 }
 
 .section {
-  background-color: yellowgreen;
-  padding: 0.3rem;
+  background-color: #ffffff;
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 /* Navbar */
@@ -104,7 +104,7 @@ button:hover {
 /* Forms */
 form {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -523,7 +523,31 @@ body::after {
 .career-title, .career-title-kin { color: #fff; }
 .career-subtitle-lg, .career-subtitle-kin { color: #e7f1ff; }
 
-/* Full-height pages (fit the whole screen) */
-html, body, #root { height: 100%; }
-.page { min-height: 100vh; display: flex; flex-direction: column; }
-.section { width: 100%; }
+/* Home blocks grid */
+.block-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(260px, 1fr); gap: 0.75rem; }
+.block { position: relative; padding: 0.75rem; border-radius: 12px; overflow: hidden; color: #0f172a; display:flex; flex-direction: column; }
+.block-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: .5rem; }
+.block-expand, .block-close { background: rgba(0,0,0,0.65); color:#fff; border:none; border-radius:8px; padding: .25rem .5rem; cursor:pointer; }
+.block-grid.expanded .block:not(.expanded) { display: none; }
+.block.expanded { grid-column: 1/-1; grid-row: 1/span 2; min-height: calc(100vh - 160px); }
+
+/* Unique backgrounds per block */
+.block-welcome { background: linear-gradient(135deg, rgba(13,110,253,.10), rgba(13,202,240,.12)), url('https://images.unsplash.com/photo-1507238691721-5605570a07b7?q=80&w=1200&auto=format&fit=crop') center/cover; }
+.block-market { background: linear-gradient(135deg, rgba(255,193,7,.10), rgba(25,135,84,.12)), url('https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop') center/cover; }
+.block-gallery { background: linear-gradient(135deg, rgba(111,66,193,.10), rgba(220,53,69,.12)), url('https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=1200&auto=format&fit=crop') center/cover; }
+.block-quiz { background: linear-gradient(135deg, rgba(0,123,255,.10), rgba(108,117,125,.12)), url('https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1200&auto=format&fit=crop') center/cover; }
+.block-offers { background: linear-gradient(135deg, rgba(40,167,69,.10), rgba(23,162,184,.12)), url('https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?q=80&w=1200&auto=format&fit=crop') center/cover; }
+.block-stories { background: linear-gradient(135deg, rgba(255,193,7,.10), rgba(220,53,69,.12)), url('https://images.unsplash.com/photo-1515165562835-c3b8c0bfbf54?q=80&w=1200&auto=format&fit=crop') center/cover; }
+
+/* Image grid inside gallery block */
+.image-grid { display:grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+.image-card { height: 120px; border-radius: 10px; overflow:hidden; background:#ddd; position:relative; }
+.image-card:nth-child(1){ background:url('https://images.unsplash.com/photo-1569074187119-3bb034bebb31?q=80&w=800&auto=format&fit=crop') center/cover; }
+.image-card:nth-child(2){ background:url('https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=800&auto=format&fit=crop') center/cover; }
+.image-card:nth-child(3){ background:url('https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=800&auto=format&fit=crop') center/cover; }
+.image-card:nth-child(4){ background:url('https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800&auto=format&fit=crop') center/cover; }
+.image-overlay { position:absolute; inset:auto 0 0 0; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55)); color:#fff; padding:6px 8px; font-weight:600; font-size:.9rem; }
+
+/* Ensure no scrollbars by making blocks adapt */
+.block-grid { height: calc(100vh - 160px); }
+.block { backdrop-filter: blur(1px); }
