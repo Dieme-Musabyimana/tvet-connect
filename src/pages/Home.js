@@ -233,7 +233,7 @@ export default function Home() {
             {!isExpanded('quiz') && <button className="block-expand" onClick={() => expand('quiz')}>Expand</button>}
             {isExpanded('quiz') && <button className="block-close" onClick={close}>Close</button>}
           </div>
-          <p>Answer questions about TVET and get a chance to win 200 RWF!</p>
+          <p>Answer questions about TVET to know more about it  </p>
           <Quiz />
         </div>
 
