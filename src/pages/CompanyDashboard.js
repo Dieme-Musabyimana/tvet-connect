@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDB } from "../context/InMemoryDB";
 
 export default function CompanyDashboard() {
-  const { currentUser, profiles, createJobPost, offerStudent, jobPosts, addCompanyComment, offeredStudents, sendCompanyToSchoolMessage, getCompanySchoolMessages } = useDB();
+  const { currentUser, profiles, createJobPost, offerStudent, jobPosts, addCompanyComment, offeredStudents, sendCompanyToSchoolMessage, getCompanySchoolMessages, getCompanyApplications } = useDB();
   const company = currentUser?.details;
   const approvedProfiles = profiles.filter(p => p.status === "approved");
   const myOfferedStudents = offeredStudents.filter(o => o.company.companyId === company.companyId);
@@ -202,6 +202,22 @@ export default function CompanyDashboard() {
           )}
         </div>
       </div>
+
+      {/* Applications to Your Posts */}
+      <h2>Applications Received</h2>
+      {getCompanyApplications(company.companyId).length > 0 ? (
+        getCompanyApplications(company.companyId).map(app => (
+          <div key={app.id} className="profile-card">
+            <p><strong>Position:</strong> {app.jobPost?.position} ({app.jobPost?.type})</p>
+            <p><strong>Applicant:</strong> {app.studentProfile?.bothNames} — {app.studentProfile?.studentId}</p>
+            <p><strong>School:</strong> {app.studentProfile?.school}</p>
+            <p><strong>Skills:</strong> {app.studentProfile?.skills}</p>
+            <p><em>Applied on {new Date(app.timestamp || app.id).toLocaleString()}</em></p>
+          </div>
+        ))
+      ) : (
+        <p>No applications yet.</p>
+      )}
     </div>
   );
 }

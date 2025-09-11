@@ -183,7 +183,8 @@ export default function StudentDashboard() {
       )}
 
       {/* Share Success Story Section */}
-      {isOffered && (
+      {/* Success story sharing available to any student with an approved profile */}
+      {studentProfile && studentProfile.status === 'approved' && (
         <div className="section">
           <h2>Share Your Success Story</h2>
           <form onSubmit={handleStorySubmit}>

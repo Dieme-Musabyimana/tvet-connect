@@ -188,9 +188,12 @@ export const DBProvider = ({ children }) => {
       id: Date.now(), 
       studentId, 
       jobPostId, 
-      status: 'pending' 
+      status: 'pending',
+      timestamp: Date.now()
     };
     setDB(prev => ({ ...prev, applications: [...prev.applications, newApplication] }));
+    // Persist immediately so company sees it without reload
+    try { localStorage.setItem('tvet_db', JSON.stringify({ ...db, applications: [...applications, newApplication] })); } catch {}
     return { success: true, message: "Application submitted successfully!" };
   };
 
@@ -200,10 +203,9 @@ export const DBProvider = ({ children }) => {
     if (studentProfile && company) {
       setDB(prev => ({
         ...prev,
-        // Add to offered
+        // Add to offered but keep profile visible for student and school
         offeredStudents: [...prev.offeredStudents, { student: studentProfile, company, offerType }],
-        // Remove student's approved profile from approved list (hide from company/student lists)
-        profiles: prev.profiles.filter(p => p.studentId !== studentId),
+        profiles: prev.profiles, // keep profiles intact
       }));
       return { success: true, message: `Offer for ${studentProfile.bothNames} sent successfully!` };
     }
@@ -211,11 +213,15 @@ export const DBProvider = ({ children }) => {
   };
   
   const addSuccessStory = (storyData) => {
-    // Find if author is an offered student to attach their image
+    // Attach author info and image
     let authorImage = null;
+    let authorStudentId = null;
+    let authorContact = currentUser?.details?.phone || currentUser?.details?.contactNumber || currentUser?.details?.email || null;
     if (currentUser?.role === 'student') {
+      authorStudentId = currentUser.details.studentId;
+      const profile = profiles.find(p => p.studentId === currentUser.details.studentId);
       const offered = offeredStudents.find(o => o.student.studentId === currentUser.details.studentId);
-      authorImage = offered?.student?.studentPhoto || null;
+      authorImage = profile?.studentPhoto || offered?.student?.studentPhoto || null;
     }
     const newStory = { 
       id: Date.now(), 
@@ -223,6 +229,8 @@ export const DBProvider = ({ children }) => {
       author: currentUser.details.bothNames || currentUser.details.email, 
       authorRole: currentUser.role,
       authorImage,
+      authorStudentId,
+      authorContact,
       timestamp: Date.now()
     };
     setDB(prev => ({ ...prev, successStories: [...prev.successStories, newStory] }));
@@ -284,6 +292,7 @@ export const DBProvider = ({ children }) => {
   const sendMessageToStudent = ({ studentId, text, from }) => {
     const msg = { id: Date.now(), studentId, text, from, timestamp: Date.now() };
     setDB(prev => ({ ...prev, studentMessages: [...prev.studentMessages, msg] }));
+    try { localStorage.setItem('tvet_db', JSON.stringify({ ...db, studentMessages: [...studentMessages, msg] })); } catch {}
     return { success: true };
   };
   const getMessagesForStudent = (studentId) => studentMessages.filter(m => m.studentId === studentId).sort((a,b)=>a.timestamp-b.timestamp);

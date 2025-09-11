@@ -187,7 +187,22 @@ function CareerPathFinder({ users, offeredStudents, successStories }) {
                       <img src={story.imageUrl} alt="Success" style={{ width: '100%', borderRadius: 8, marginTop: 8 }} />
                     )}
                     <p><strong>{story.title}</strong> by {story.author}</p>
+                    {story.authorContact && <p><strong>Contact:</strong> {story.authorContact}</p>}
                     <p>{story.text}</p>
+                    {/* Optional chat with story author if they are a student and we have their ID */}
+                    {story.authorStudentId && (
+                      <div className="chat-container" style={{height: 180, marginTop: 8}}>
+                        <div className="chat-display">
+                          {getMessagesForStudent(story.authorStudentId).map(m => (
+                            <div key={m.id} className="chat-message"><strong>{m.from}:</strong> {m.text}</div>
+                          ))}
+                        </div>
+                        <form onSubmit={(e)=>{ e.preventDefault(); if(!chatText.trim()) return; sendMessageToStudent({ studentId: story.authorStudentId, text: chatText.trim(), from: 'public' }); setChatText(''); }} className="chat-form">
+                          <input type="text" placeholder={`Message ${story.author}...`} value={chatText} onChange={(e)=>setChatText(e.target.value)} />
+                          <button type="submit">Send</button>
+                        </form>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
