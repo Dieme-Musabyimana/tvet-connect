@@ -106,6 +106,23 @@ button:hover {
   flex: 1 1 200px;
 }
 
+/******** Auth / Register / Login ********/
+.auth-page { display:flex; justify-content:center; align-items:flex-start; padding-top: 2rem; }
+.auth-card { width: min(880px, 100%); background:#fff; border:1px solid #edf2f7; border-radius:12px; padding:1rem; box-shadow: 0 8px 20px rgba(0,0,0,0.04); }
+.auth-header h1 { margin:0; font-size:1.5rem; }
+.auth-subtitle { margin:0.25rem 0 1rem; color:#64748b; }
+.grid-2 { display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; }
+.col-span-2 { grid-column: 1 / -1; }
+.form-group { display:flex; flex-direction:column; gap:0.25rem; }
+.form-group label { font-size:0.88rem; color:#334155; }
+.auth-form select, .auth-form input { width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:0.95rem; background:#f8fafc; }
+.auth-form select:focus, .auth-form input:focus { outline:none; border-color:#0ea5e9; background:#fff; box-shadow:0 0 0 3px rgba(14,165,233,0.1); }
+.form-actions { display:flex; justify-content:flex-end; }
+.btn-small { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; background:#0ea5e9; color:#fff; border:none; cursor:pointer; }
+.btn-small:hover { background:#0284c7; }
+.auth-message { color:#0f172a; margin-top:0.5rem; }
+.auth-footer { margin-top:0.25rem; color:#334155; }
+
 /* Forms */
 form {
   display: flex;
@@ -532,6 +549,22 @@ body::after {
 
 /* Home blocks grid - fill page height */
 .block-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(260px, 1fr); gap: 0.75rem; height: calc(100vh - 160px); }
+/* 3 columns rows for dashboards */
+.block-grid.three-cols { display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.block-grid.three-cols .block { min-height: 260px; }
+/* horizontal scrolling row of blocks */
+ /* 2x2 layout for dashboards */
+ .block-grid.two-cols { display:grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; grid-auto-rows: minmax(360px, auto); height: auto; }
+ .block-grid.two-cols .block { min-height: 360px; }
+.block-grid.horizontal { display:flex; gap:0.75rem; flex-wrap: nowrap; overflow-x:auto; padding-bottom: .25rem; }
+.block-grid.horizontal .block { flex: 0 0 360px; }
+/* distinct backgrounds for blocks */
+.bg-a { background: linear-gradient(135deg, #e3f2fd, #f5faff); }
+.bg-b { background: linear-gradient(135deg, #fff7ed, #fffbeb); }
+.bg-c { background: linear-gradient(135deg, #f3e8ff, #faf5ff); }
+.bg-d { background: linear-gradient(135deg, #ecfeff, #f0f9ff); }
+.bg-e { background: linear-gradient(135deg, #e3fcec, #f0fff4); }
+.bg-f { background: linear-gradient(135deg, #fef2f2, #fff7f7); }
 .block { position: relative; padding: 0.75rem; border-radius: 12px; overflow: auto; /* enable scroll within each block */ color: #0f172a; display:flex; flex-direction: column; background-size: cover; background-position: center; }
 .block-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: .5rem; }
 .block-expand, .block-close { background: rgba(0,0,0,0.65); color:#fff; border:none; border-radius:8px; padding: .25rem .5rem; cursor:pointer; }

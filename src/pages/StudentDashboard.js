@@ -109,109 +109,120 @@ export default function StudentDashboard() {
     <div className="page">
       <h1>Student Dashboard</h1>
 
-      {/* Student Profile Section */}
-      <h2>My Profile</h2>
-      {isOffered ? (
-        <div className="profile-card">
-          <p><strong>Congratulations!</strong> You have an offer from {offeredPosition.company.companyName} for a {offeredPosition.offerType}.</p>
-          <p>Your profile is no longer editable.</p>
+      <div className="block-grid two-cols">
+        {/* My Profile */}
+        <div className="block block-profile bg-a">
+          <h2>My Profile</h2>
+          {isOffered ? (
+            <div className="profile-card">
+              <p><strong>Congratulations!</strong> You have an offer from {offeredPosition.company.companyName} for a {offeredPosition.offerType}.</p>
+              <p>Your profile is no longer editable.</p>
+            </div>
+          ) : studentProfile && studentProfile.status === "approved" ? (
+            <div className="profile-card">
+              <p>Status: <strong>{studentProfile.status.toUpperCase()}</strong></p>
+              <p>Name: {studentProfile.bothNames}</p>
+              <p>Student ID: {studentProfile.studentId}</p>
+              <p>School: {studentProfile.school}</p>
+              <p>Description: {studentProfile.description}</p>
+              <p>Skills: {studentProfile.skills}</p>
+              <p>Target: {studentProfile.target}</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <h3>{studentProfile ? "Edit Your Pending Profile" : "Create Your Profile"}</h3>
+              <p>Your profile will be sent to your school for verification.</p>
+              <textarea
+                name="description"
+                placeholder="Tell us about yourself..."
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="skills"
+                placeholder="Skills (comma-separated)"
+                value={formData.skills}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="target"
+                placeholder="Your career target"
+                value={formData.target}
+                onChange={handleChange}
+                required
+              />
+              <select name="field" value={formData.field} onChange={handleChange} required>
+                <option value="">Select Field of Study</option>
+                {schoolFields.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+              <select name="level" value={formData.level} onChange={handleChange} required>
+                <option value="">Select Level of Study</option>
+                {levels.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+              <button type="submit">
+                {isProfilePending ? "Update Profile" : "Submit Profile for Approval"}
+              </button>
+            </form>
+          )}
         </div>
-      ) : studentProfile && studentProfile.status === "approved" ? (
-        <div className="profile-card">
-          <p>Status: <strong>{studentProfile.status.toUpperCase()}</strong></p>
-          <p>Name: {studentProfile.bothNames}</p>
-          <p>Student ID: {studentProfile.studentId}</p>
-          <p>School: {studentProfile.school}</p>
-          <p>Description: {studentProfile.description}</p>
-          <p>Skills: {studentProfile.skills}</p>
-          <p>Target: {studentProfile.target}</p>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <h3>{studentProfile ? "Edit Your Pending Profile" : "Create Your Profile"}</h3>
-          <p>Your profile will be sent to your school for verification.</p>
-          <textarea
-            name="description"
-            placeholder="Tell us about yourself..."
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="skills"
-            placeholder="Skills (comma-separated)"
-            value={formData.skills}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="target"
-            placeholder="Your career target"
-            value={formData.target}
-            onChange={handleChange}
-            required
-          />
-          <select name="field" value={formData.field} onChange={handleChange} required>
-            <option value="">Select Field of Study</option>
-            {schoolFields.map(f => <option key={f} value={f}>{f}</option>)}
-          </select>
-          <select name="level" value={formData.level} onChange={handleChange} required>
-            <option value="">Select Level of Study</option>
-            {levels.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-          <button type="submit">
-            {isProfilePending ? "Update Profile" : "Submit Profile for Approval"}
-          </button>
-        </form>
-      )}
 
-      {/* Student Feedback Section */}
-      {isOffered && (
-        <div className="section">
+        {/* Feedback */}
+        <div className="block block-feedback bg-b">
           <h2>Send Feedback to Your School</h2>
-          <p>You received an offer from {offeredPosition.company.companyName} for a {offeredPosition.offerType}.</p>
-          <form onSubmit={handleFeedbackSubmit}>
-            <textarea
-              placeholder="Enter your feedback about the offer for your school..."
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              required
-            />
-            <button type="submit">Send Feedback</button>
-          </form>
+          {isOffered ? (
+            <>
+              <p>You received an offer from {offeredPosition.company.companyName} for a {offeredPosition.offerType}.</p>
+              <form onSubmit={handleFeedbackSubmit}>
+                <textarea
+                  placeholder="Enter your feedback about the offer for your school..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  required
+                />
+                <button type="submit">Send Feedback</button>
+              </form>
+            </>
+          ) : (
+            <p>No offer yet. Feedback will be available after receiving an offer.</p>
+          )}
         </div>
-      )}
 
-      {/* Share Success Story Section */}
-      {/* Success story sharing available to any student with an approved profile */}
-      {studentProfile && studentProfile.status === 'approved' && (
-        <div className="section">
+        {/* Success Story */}
+        <div className="block block-story bg-c">
           <h2>Share Your Success Story</h2>
-          <form onSubmit={handleStorySubmit}>
-            <input type="text" name="title" placeholder="Story Title" value={storyData.title} onChange={handleStoryChange} required />
-            <textarea name="text" placeholder="Your story..." value={storyData.text} onChange={handleStoryChange} required />
-            <input type="file" name="photo" onChange={handleStoryChange} accept="image/*" />
-            <input type="file" name="file" onChange={handleStoryChange} />
-            <button type="submit">Share Story</button>
-          </form>
+          {studentProfile && studentProfile.status === 'approved' ? (
+            <form onSubmit={handleStorySubmit}>
+              <input type="text" name="title" placeholder="Story Title" value={storyData.title} onChange={handleStoryChange} required />
+              <textarea name="text" placeholder="Your story..." value={storyData.text} onChange={handleStoryChange} required />
+              <input type="file" name="photo" onChange={handleStoryChange} accept="image/*" />
+              <input type="file" name="file" onChange={handleStoryChange} />
+              <button type="submit">Share Story</button>
+            </form>
+          ) : (
+            <p>Get your profile approved to share your story.</p>
+          )}
         </div>
-      )}
 
-      {/* Job Postings Section */}
-      <h2>Available Opportunities</h2>
-      {jobPosts.length > 0 ? (
-        jobPosts.map(post => (
-          <div key={post.id} className="profile-card">
-            <h3>{post.position} ({post.type})</h3>
-            <p><strong>Company:</strong> {post.companyName}</p>
-            <p><strong>Description:</strong> {post.description}</p>
-            <p><strong>Skills Required:</strong> {post.requiredSkills}</p>
-            <button onClick={() => handleApply(post.id)}>Apply Now</button>
-          </div>
-        ))
-      ) : (
-        <p>No opportunities have been posted yet.</p>
-      )}
+        {/* Opportunities */}
+        <div className="block block-opps bg-d">
+          <h2>Available Opportunities</h2>
+          {jobPosts.length > 0 ? (
+            jobPosts.map(post => (
+              <div key={post.id} className="profile-card">
+                <h3>{post.position} ({post.type})</h3>
+                <p><strong>Company:</strong> {post.companyName}</p>
+                <p><strong>Description:</strong> {post.description}</p>
+                <p><strong>Skills Required:</strong> {post.requiredSkills}</p>
+                <button onClick={() => handleApply(post.id)}>Apply Now</button>
+              </div>
+            ))
+          ) : (
+            <p>No opportunities have been posted yet.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

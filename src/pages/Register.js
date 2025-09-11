@@ -72,63 +72,79 @@ export default function Register() {
   };
 
   return (
-    <div className="page">
-      <h1>Create {role} Account</h1>
-      <form onSubmit={handleSubmit} className="auth-form">
-        {role === "student" && (
-          <>
-            {/* Select school category first */}
-            <select name="category" value={formData.category || ""} onChange={handleChange} required>
-              <option value="">Select your School Category</option>
-              <option value="RP College">RP College</option>
-              <option value="TSS">TSS</option>
-              <option value="VTC">VTC</option>
-            </select>
-            {/* Then select a school from registered schools that match category */}
-            <select name="school" value={formData.school || ""} onChange={handleChange} required>
-              <option value="">Select your School</option>
-              {schools
-                .filter(s => (formData.category ? (s.details.category === formData.category) : true))
-                .map(school => (
-                  <option key={school.id} value={school.details.schoolName}>
-                    {school.details.schoolName}
-                  </option>
-                ))}
-            </select>
-          </>
-        )}
+    <div className="page auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1>Create {role} Account</h1>
+          <p className="auth-subtitle">Join TVET Connect and start your journey.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="auth-form grid-2">
+          {role === "student" && (
+            <>
+              <div className="form-group col-span-2">
+                <label>School Category</label>
+                <select name="category" value={formData.category || ""} onChange={handleChange} required>
+                  <option value="">Select your School Category</option>
+                  <option value="RP College">RP College</option>
+                  <option value="TSS">TSS</option>
+                  <option value="VTC">VTC</option>
+                </select>
+              </div>
+              <div className="form-group col-span-2">
+                <label>School</label>
+                <select name="school" value={formData.school || ""} onChange={handleChange} required>
+                  <option value="">Select your School</option>
+                  {schools
+                    .filter(s => (formData.category ? (s.details.category === formData.category) : true))
+                    .map(school => (
+                      <option key={school.id} value={school.details.schoolName}>
+                        {school.details.schoolName}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </>
+          )}
 
-        {roleFields[role] && roleFields[role].map((field) => (
-          field.type === 'select' ? (
-            <select
-              key={field.name}
-              name={field.name}
-              onChange={handleChange}
-              required={field.required}
-              value={formData[field.name] || ''}
-            >
-              <option value="">{field.label}</option>
-              {field.options.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <input
-              key={field.name}
-              type={field.type}
-              name={field.name}
-              placeholder={field.label}
-              onChange={handleChange}
-              required={field.required}
-            />
-          )
-        ))}
-        <button type="submit">Create Account</button>
-      </form>
-      <p>{message}</p>
-      <p>
-        Already have an account? <Link to={`/login/${role}`}>Log in here</Link>
-      </p>
+          {roleFields[role] && roleFields[role].map((field) => (
+            field.type === 'select' ? (
+              <div className="form-group" key={field.name}>
+                <label>{field.label}</label>
+                <select
+                  name={field.name}
+                  onChange={handleChange}
+                  required={field.required}
+                  value={formData[field.name] || ''}
+                >
+                  <option value="">Select</option>
+                  {field.options.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="form-group" key={field.name}>
+                <label>{field.label}</label>
+                <input
+                  type={field.type}
+                  name={field.name}
+                  placeholder={field.label}
+                  onChange={handleChange}
+                  required={field.required}
+                />
+              </div>
+            )
+          ))}
+
+          <div className="form-actions col-span-2">
+            <button type="submit" className="btn-small">Create Account</button>
+          </div>
+        </form>
+        <p className="auth-message">{message}</p>
+        <p className="auth-footer">
+          Already have an account? <Link to={`/login/${role}`}>Log in here</Link>
+        </p>
+      </div>
     </div>
   );
 }
